@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-background transition-colors duration-500;
+  }
+  :root {
+    --color-primary: 21 71 38; /* dark green for light mode */
+    --color-on-primary: 255 255 255;
+    --color-primary-container: 232 245 232;
+    --color-on-primary-container: 0 33 0;
+    
+    --color-secondary: 82 99 79;
+    --color-secondary-container: 232 236 231;
+    --color-on-secondary-container: 17 31 15;
+    
+    --color-tertiary: 56 101 106;
+    --color-tertiary-container: 224 242 244;
+    --color-on-tertiary-container: 0 31 35;
+    
+    --color-error: 186 26 26;
+    --color-on-error: 255 255 255;
+    --color-error-container: 255 218 214;
+    --color-on-error-container: 65 0 2;
+    
+    --color-background: 251 252 251;
+    --color-on-background: 26 46 25;
+    
+    --color-surface: 255 255 255;
+    --color-on-surface: 26 46 25;
+    
+    --color-surface-variant: 226 227 224;
+    --color-on-surface-variant: 90 110 90;
+    
+    --color-outline: 114 121 111;
+    --color-outline-variant: 219 227 219;
+    
+    --color-surface-container-lowest: 255 255 255;
+    --color-surface-container-low: 245 247 245;
+    --color-surface-container: 255 255 255;
+    --color-surface-container-high: 245 247 245;
+    --color-surface-container-highest: 239 242 239;
+    
+    --color-primary-fixed: 197 235 212;
+    --color-primary-fixed-dim: 169 207 185;
+    --color-on-primary-fixed: 0 33 19;
+  }
+
+  .dark {
+    --color-primary: 197 235 212; /* light mint for dark mode */
+    --color-on-primary: 0 33 19;
+    --color-primary-container: 45 79 62;
+    --color-on-primary-container: 197 235 212;
+    
+    --color-secondary: 191 201 195;
+    --color-secondary-container: 63 73 69;
+    --color-on-secondary-container: 221 172 123;
+    
+    --color-tertiary: 196 199 197;
+    --color-tertiary-container: 69 73 72;
+    --color-on-tertiary-container: 224 227 225;
+    
+    --color-error: 198 40 40; /* vibrant red */
+    --color-on-error: 255 255 255;
+    --color-error-container: 147 0 10;
+    --color-on-error-container: 255 218 214;
+    
+    --color-background: 12 22 12;
+    --color-on-background: 218 230 213;
+    
+    --color-surface: 12 22 12;
+    --color-on-surface: 218 230 213;
+    
+    --color-surface-variant: 65 72 68;
+    --color-on-surface-variant: 193 200 194;
+    
+    --color-outline: 140 147 136;
+    --color-outline-variant: 66 73 64;
+    
+    --color-surface-container-lowest: 7 16 7;
+    --color-surface-container-low: 20 30 20;
+    --color-surface-container: 24 34 23;
+    --color-surface-container-high: 34 45 33;
+    --color-surface-container-highest: 45 56 44;
+    
+    --color-primary-fixed: 193 239 185;
+    --color-primary-fixed-dim: 165 210 158;
+    --color-on-primary-fixed: 0 34 4;
+  }
+}
+
+@layer utilities {
+    .glass-morphism {
+        background: rgba(45, 79, 62, 0.1);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(169, 207, 185, 0.1);
+    }
+    
+    .dark .glass-morphism {
+        background: rgba(33, 37, 35, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(139, 147, 141, 0.2);
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(219, 227, 219, 0.3);
+    }
+
+    .dark .glass-panel {
+        background: rgba(45, 55, 43, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(66, 73, 64, 0.8);
+    }
+    
+    .floating-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .floating-card:hover {
+        transform: translateY(-4px);
+    }
+    
+    .text-glow {
+        text-shadow: 0 0 20px rgba(76, 166, 76, 0.3);
+    }
+    
+    .dark .text-glow {
+        text-shadow: 0 0 20px rgba(165, 210, 158, 0.3);
+    }
+    
+    .interactive-btn {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .interactive-btn:active {
+        transform: scale(0.95);
+    }
+
+    .staggered-entry {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s forwards;
+    }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
