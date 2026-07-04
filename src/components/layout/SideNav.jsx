@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../ui/Button';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useChat } from '../../context/ChatContext';
@@ -9,6 +9,7 @@ export default function SideNav() {
     const isDashboard = location.pathname === '/';
     const isPlantProfile = location.pathname.startsWith('/plant/');
     const { sessions, startNewChat } = useChat();
+    const [openSection, setOpenSection] = useState('health');
     return (
         <aside className="hidden md:flex h-screen w-[260px] sticky left-0 top-0 bg-background border-r border-outline-variant/30 flex-col pt-8 pb-6 z-50 transition-colors duration-500">
             {isAssistant ? (
@@ -42,8 +43,8 @@ export default function SideNav() {
                             <span className="font-body-md text-[15px] font-medium">Garden</span>
                         </NavLink>
                         <NavLink to="/journal" className="flex items-center gap-3 py-3 px-4 rounded-full transition-colors text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-300">
-                            <span className="material-symbols-outlined text-[20px]">history</span>
-                            <span className="font-body-md text-[15px] font-medium">History</span>
+                            <span className="material-symbols-outlined text-[20px]">auto_stories</span>
+                            <span className="font-body-md text-[15px] font-medium">Journal</span>
                         </NavLink>
 
                         {/* Recent Chats Section */}
@@ -83,11 +84,17 @@ export default function SideNav() {
                             </NavLink>
                         </div>
 
-                        {!isPlantProfile && (
+                        {!isPlantProfile && location.pathname !== '/journal' && (
                             <>
                                 <div className="flex flex-col gap-2">
-                                    <span className="font-label-md text-[11px] text-on-surface-variant font-semibold uppercase tracking-widest px-6 mb-2">Health Status</span>
-                                    <div className="flex flex-col gap-1">
+                                    <div 
+                                        className="flex items-center justify-between px-6 mb-2 group cursor-pointer"
+                                        onClick={() => setOpenSection(openSection === 'health' ? null : 'health')}
+                                    >
+                                        <span className="font-label-md text-[11px] text-on-surface-variant font-semibold uppercase tracking-widest">Health Status</span>
+                                        <span className={`material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-transform duration-300 ${openSection === 'health' ? 'rotate-180' : ''}`}>expand_more</span>
+                                    </div>
+                                    <div className={`flex-col gap-1 overflow-hidden transition-all duration-300 ${openSection === 'health' ? 'flex max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
                                         <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer bg-surface-container-highest hover-interactive">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></div>
                                             <span className="font-body-md text-[14px] text-on-surface font-medium">All Plants</span>
@@ -104,11 +111,14 @@ export default function SideNav() {
                                 </div>
                                 
                                 <div className="flex flex-col gap-2">
-                                    <div className="flex items-center justify-between px-6 mb-2 group cursor-pointer">
+                                    <div 
+                                        className="flex items-center justify-between px-6 mb-2 group cursor-pointer"
+                                        onClick={() => setOpenSection(openSection === 'location' ? null : 'location')}
+                                    >
                                         <span className="font-label-md text-[11px] text-on-surface-variant font-semibold uppercase tracking-widest">Location</span>
-                                        <span className="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:text-primary transition-colors">add</span>
+                                        <span className={`material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-transform duration-300 ${openSection === 'location' ? 'rotate-180' : ''}`}>expand_more</span>
                                     </div>
-                                    <div className="flex flex-col gap-1">
+                                    <div className={`flex-col gap-1 overflow-hidden transition-all duration-300 ${openSection === 'location' ? 'flex max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
                                         <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer bg-surface-container-highest hover-interactive">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></div>
                                             <span className="font-body-md text-[14px] text-on-surface font-medium">Living Room</span>

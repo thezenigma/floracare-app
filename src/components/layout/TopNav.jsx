@@ -17,7 +17,7 @@ export default function TopNav() {
                 <div className="max-w-[1400px] mx-auto flex justify-end items-center w-full">
                     
                     <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-[20px] text-on-surface-variant">light_mode</span>
                             <button 
                                 onClick={toggleTheme} 
@@ -25,6 +25,7 @@ export default function TopNav() {
                             >
                                 <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-primary transition-transform duration-300 transform flex items-center justify-center ${isDark ? 'translate-x-6' : ''}`}></div>
                             </button>
+                            <span className="material-symbols-outlined text-[20px] text-on-surface-variant">dark_mode</span>
                         </div>
                         <button 
                             onClick={() => setIsLoginOpen(true)}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EntryLog from '../components/journal/EntryLog';
+import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function Journal() {
     const [activeFilter, setActiveFilter] = useState('All Activities');
@@ -45,126 +46,136 @@ export default function Journal() {
 
     return (
         <div className="flex flex-col gap-6 relative h-full w-full">
-            <div className="flex items-center justify-between mb-2">
-                <h2 className="font-headline-sm text-primary font-bold text-[24px]">Progress Journal</h2>
-            </div>
+            <ScrollReveal direction="down">
+                <div className="flex items-center justify-between mb-2">
+                    <h2 className="font-headline-sm text-primary font-bold text-[24px]">Progress Journal</h2>
+                </div>
+            </ScrollReveal>
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left: Primary Feed */}
                 <section className="lg:col-span-8 space-y-6">
-                    <div className="flex items-center justify-between mb-6 animate-stagger transition-colors duration-500" style={{ animationDelay: '100ms' }}>
-                        <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                            {filters.map(filter => (
-                                <button
-                                    key={filter}
-                                    onClick={() => setActiveFilter(filter)}
-                                    className={`px-6 py-2 rounded-full font-label-md text-[14px] transition-colors duration-300 shadow-sm ${activeFilter === filter ? 'bg-primary text-white dark:text-[#002113]' : 'bg-surface-container-lowest text-on-surface-variant border border-outline-variant hover:bg-surface-container-highest'}`}
-                                >
-                                    {filter}
-                                </button>
-                            ))}
+                    <ScrollReveal direction="left" delay={0.1}>
+                        <div className="flex items-center justify-between mb-6 transition-colors duration-500">
+                            <div className="flex gap-3 overflow-x-auto no-scrollbar">
+                                {filters.map(filter => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setActiveFilter(filter)}
+                                        className={`px-6 py-2 rounded-full font-label-md text-[14px] transition-colors duration-300 shadow-sm ${activeFilter === filter ? 'bg-primary text-white dark:text-[#002113]' : 'bg-surface-container-lowest text-on-surface-variant border border-outline-variant hover:bg-surface-container-highest'}`}
+                                    >
+                                        {filter}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    </ScrollReveal>
                     <div className="flex flex-col gap-6">
                         {entries.map((entry, index) => (
-                            <EntryLog key={entry.id} entry={entry} index={index} />
+                            <ScrollReveal key={entry.id} direction="up" delay={0.1 * (index + 2)}>
+                                <EntryLog entry={entry} index={index} />
+                            </ScrollReveal>
                         ))}
                     </div>
                 </section>
 
                 {/* Right Sidebar */}
                 <aside className="lg:col-span-4 space-y-6">
-                    <section className="bg-surface rounded-2xl p-6 shadow-sm border border-outline-variant/30 sticky top-28 animate-stagger transition-colors duration-500" style={{ animationDelay: '500ms' }}>
-                        <h3 className="font-headline-sm text-primary font-bold mb-6 flex items-center gap-2 text-[20px]">
-                            <span className="material-symbols-outlined text-primary">edit_note</span>
-                            Daily Log
-                        </h3>
-                        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                            <div>
-                                <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Tag a Plant</label>
-                                <div className="relative">
-                                    <div 
-                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                        className="w-full bg-background border border-outline-variant/30 rounded-[1rem] p-4 font-body-md text-on-surface focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer transition-all duration-300 shadow-sm flex items-center justify-between relative z-20"
-                                    >
-                                        <span>{selectedPlant}</span>
-                                        <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
-                                    </div>
-                                    
-                                    {isDropdownOpen && (
-                                        <>
-                                            <div 
-                                                className="fixed inset-0 z-10"
-                                                onClick={() => setIsDropdownOpen(false)}
-                                            ></div>
-                                            <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-surface border border-outline-variant/30 rounded-[1rem] py-2 shadow-lg z-30 overflow-hidden animate-stagger" style={{ animationDelay: '0ms' }}>
-                                                {plantOptions.map((option) => (
-                                                    <div
-                                                        key={option}
-                                                        onClick={() => {
-                                                            setSelectedPlant(option);
-                                                            setIsDropdownOpen(false);
-                                                        }}
-                                                        className={`px-4 py-3 cursor-pointer text-[14px] transition-colors duration-200 ${selectedPlant === option ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-high'}`}
-                                                    >
-                                                        {option}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Category</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {logCategories.map(category => (
-                                        <button 
-                                            key={category}
-                                            onClick={() => setActiveLogCategory(category)}
-                                            className={`px-4 py-2 rounded-full font-label-sm text-[12px] transition-all duration-300 ${activeLogCategory === category ? 'bg-primary text-white dark:text-[#002113] shadow-sm border border-transparent' : 'border border-outline-variant/50 bg-surface text-on-surface hover:bg-surface-container-high'}`}
-                                            type="button"
+                    <ScrollReveal direction="right" delay={0.3}>
+                        <section className="bg-surface rounded-2xl p-6 shadow-sm border border-outline-variant/30 sticky top-28 transition-colors duration-500">
+                            <h3 className="font-headline-sm text-primary font-bold mb-6 flex items-center gap-2 text-[20px]">
+                                <span className="material-symbols-outlined text-primary">edit_note</span>
+                                Daily Log
+                            </h3>
+                            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                                <div>
+                                    <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Tag a Plant</label>
+                                    <div className="relative">
+                                        <div 
+                                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                            className="w-full bg-background border border-outline-variant/30 rounded-[1rem] p-4 font-body-md text-on-surface focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer transition-all duration-300 shadow-sm flex items-center justify-between relative z-20"
                                         >
-                                            {category}
-                                        </button>
-                                    ))}
+                                            <span>{selectedPlant}</span>
+                                            <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                                        </div>
+                                        
+                                        {isDropdownOpen && (
+                                            <>
+                                                <div 
+                                                    className="fixed inset-0 z-10"
+                                                    onClick={() => setIsDropdownOpen(false)}
+                                                ></div>
+                                                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-surface border border-outline-variant/30 rounded-[1rem] py-2 shadow-lg z-30 overflow-hidden animate-stagger" style={{ animationDelay: '0ms' }}>
+                                                    {plantOptions.map((option) => (
+                                                        <div
+                                                            key={option}
+                                                            onClick={() => {
+                                                                setSelectedPlant(option);
+                                                                setIsDropdownOpen(false);
+                                                            }}
+                                                            className={`px-4 py-3 cursor-pointer text-[14px] transition-colors duration-200 ${selectedPlant === option ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-high'}`}
+                                                        >
+                                                            {option}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Category</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {logCategories.map(category => (
+                                            <button 
+                                                key={category}
+                                                onClick={() => setActiveLogCategory(category)}
+                                                className={`px-4 py-2 rounded-full font-label-sm text-[12px] transition-all duration-300 ${activeLogCategory === category ? 'bg-primary text-white dark:text-[#002113] shadow-sm border border-transparent' : 'border border-outline-variant/50 bg-surface text-on-surface hover:bg-surface-container-high'}`}
+                                                type="button"
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Observations</label>
+                                    <textarea className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[14px] text-on-surface placeholder:text-[13px] placeholder:font-light placeholder:text-on-surface-variant/70 focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all duration-300 shadow-sm" placeholder="What did you notice today?" rows="4"></textarea>
+                                </div>
+                                <div className="flex gap-4">
+                                    <button className="flex-1 bg-primary text-white dark:text-[#002113] py-3 rounded-full font-label-md text-[14px] shadow-sm hover:opacity-90 transition-opacity" type="submit">
+                                        Save Entry
+                                    </button>
+                                    <button className="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors" type="button">
+                                        <span className="material-symbols-outlined">add_a_photo</span>
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div className="mt-6 relative overflow-hidden rounded-xl bg-primary-container p-6 text-on-primary-container shadow-sm">
+                                <div className="relative z-10">
+                                    <h3 className="font-label-md text-[14px] mb-2 opacity-80 uppercase tracking-widest font-semibold">Journaling Streak</h3>
+                                    <div className="flex items-end gap-2">
+                                        <span className="font-display-lg text-[48px] leading-none font-semibold">12</span>
+                                        <span className="font-body-md text-[16px] mb-1 opacity-70">Days</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Observations</label>
-                                <textarea className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[14px] text-on-surface placeholder:text-[13px] placeholder:font-light placeholder:text-on-surface-variant/70 focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all duration-300 shadow-sm" placeholder="What did you notice today?" rows="4"></textarea>
-                            </div>
-                            <div className="flex gap-4">
-                                <button className="flex-1 bg-primary text-white dark:text-[#002113] py-3 rounded-full font-label-md text-[14px] shadow-sm hover:opacity-90 transition-opacity" type="submit">
-                                    Save Entry
-                                </button>
-                                <button className="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors" type="button">
-                                    <span className="material-symbols-outlined">add_a_photo</span>
-                                </button>
-                            </div>
-                        </form>
-                        
-                        <div className="mt-6 relative overflow-hidden rounded-xl bg-primary-container p-6 text-on-primary-container shadow-sm">
-                            <div className="relative z-10">
-                                <h3 className="font-label-md text-[14px] mb-2 opacity-80 uppercase tracking-widest font-semibold">Journaling Streak</h3>
-                                <div className="flex items-end gap-2">
-                                    <span className="font-display-lg text-[48px] leading-none font-semibold">12</span>
-                                    <span className="font-body-md text-[16px] mb-1 opacity-70">Days</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                        </section>
+                    </ScrollReveal>
 
-                    <div className="grid grid-cols-2 gap-4 animate-stagger transition-colors duration-500" style={{ animationDelay: '600ms' }}>
-                        <div className="bg-surface p-6 rounded-xl text-center shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform cursor-pointer">
-                            <p className="font-headline-sm text-[24px] font-bold text-primary">142</p>
-                            <p className="font-label-sm text-[12px] text-on-surface-variant mt-1">Total Entries</p>
+                    <ScrollReveal direction="up" delay={0.4}>
+                        <div className="grid grid-cols-2 gap-4 transition-colors duration-500">
+                            <div className="bg-surface p-6 rounded-xl text-center shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform cursor-pointer">
+                                <p className="font-headline-sm text-[24px] font-bold text-primary">142</p>
+                                <p className="font-label-sm text-[12px] text-on-surface-variant mt-1">Total Entries</p>
+                            </div>
+                            <div className="bg-surface p-6 rounded-xl text-center shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform cursor-pointer">
+                                <p className="font-headline-sm text-[24px] font-bold text-primary">8</p>
+                                <p className="font-label-sm text-[12px] text-on-surface-variant mt-1">Active Plants</p>
+                            </div>
                         </div>
-                        <div className="bg-surface p-6 rounded-xl text-center shadow-sm border border-outline-variant/30 hover:-translate-y-1 transition-transform cursor-pointer">
-                            <p className="font-headline-sm text-[24px] font-bold text-primary">8</p>
-                            <p className="font-label-sm text-[12px] text-on-surface-variant mt-1">Active Plants</p>
-                        </div>
-                    </div>
+                    </ScrollReveal>
                 </aside>
             </div>
         </div>

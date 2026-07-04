@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '../context/ChatContext';
+import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function AIAssistant() {
     const { messages, isTyping, sendMessage } = useChat();
@@ -26,17 +27,19 @@ export default function AIAssistant() {
             {messages.length === 0 ? (
                 /* Welcome Screen */
                 <div className="flex-1 flex flex-col items-center justify-center text-center px-4 transition-opacity duration-700 animate-stagger h-full overflow-y-auto pt-4 max-w-5xl mx-auto">
-                    <div className="mb-6 animate-bounce">
-                        <div className="w-20 h-20 bg-primary-container/20 rounded-full flex items-center justify-center p-4">
-                            <span className="material-symbols-outlined text-[40px] text-primary">psychiatry</span>
+                    <ScrollReveal direction="down" className="flex flex-col items-center">
+                        <div className="mb-6 animate-bounce">
+                            <div className="w-20 h-20 bg-primary-container/20 rounded-full flex items-center justify-center p-4 mx-auto">
+                                <span className="material-symbols-outlined text-[40px] text-primary">psychiatry</span>
+                            </div>
                         </div>
-                    </div>
-                    <h1 className="font-display-lg text-[36px] md:text-[48px] text-primary font-bold tracking-tight mb-4">
-                        Hello! I'm FloraCare AI
-                    </h1>
-                    <p className="font-body-lg text-[18px] text-on-surface-variant max-w-2xl mb-12">
-                        How can I help your garden thrive today? I can diagnose leaf spots, suggest seasonal planting, or optimize your irrigation schedule.
-                    </p>
+                        <h1 className="font-display-lg text-[36px] md:text-[48px] text-primary font-bold tracking-tight mb-4">
+                            Hello! I'm FloraCare AI
+                        </h1>
+                        <p className="font-body-lg text-[18px] text-on-surface-variant max-w-2xl mb-12">
+                            How can I help your garden thrive today? I can diagnose leaf spots, suggest seasonal planting, or optimize your irrigation schedule.
+                        </p>
+                    </ScrollReveal>
 
                     {/* Quick Action Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl pb-20">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { ChatProvider } from './context/ChatContext';
+import { PlantProvider } from './context/PlantContext';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -56,11 +57,13 @@ function AnimatedRoutes() {
 function App() {
   return (
     <ThemeProvider>
-      <ChatProvider>
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </ChatProvider>
+      <PlantProvider>
+        <ChatProvider>
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </ChatProvider>
+      </PlantProvider>
     </ThemeProvider>
   );
 }
