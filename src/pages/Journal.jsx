@@ -7,6 +7,7 @@ export default function Journal() {
     const [activeFilter, setActiveFilter] = useState('All Activities');
     const [activeLogCategory, setActiveLogCategory] = useState('Observation');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isMobileLogOpen, setIsMobileLogOpen] = useState(false);
     const [selectedPlant, setSelectedPlant] = useState('General Observation');
 
     const filters = ['All Activities', 'Growth', 'Maintenance'];
@@ -44,6 +45,73 @@ export default function Journal() {
         }
     ];
 
+    const renderDailyLogForm = () => (
+        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <div>
+                <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Tag a Plant</label>
+                <div className="relative">
+                    <div 
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="w-full bg-background border border-outline-variant/30 rounded-[1rem] p-4 font-body-md text-on-surface focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer transition-all duration-300 shadow-sm flex items-center justify-between relative z-20"
+                    >
+                        <span>{selectedPlant}</span>
+                        <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                    </div>
+                    
+                    {isDropdownOpen && (
+                        <>
+                            <div 
+                                className="fixed inset-0 z-10"
+                                onClick={() => setIsDropdownOpen(false)}
+                            ></div>
+                            <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-surface border border-outline-variant/30 rounded-[1rem] py-2 shadow-lg z-30 overflow-hidden animate-stagger" style={{ animationDelay: '0ms' }}>
+                                {plantOptions.map((option) => (
+                                    <div
+                                        key={option}
+                                        onClick={() => {
+                                            setSelectedPlant(option);
+                                            setIsDropdownOpen(false);
+                                        }}
+                                        className={`px-4 py-3 cursor-pointer text-[14px] transition-colors duration-200 ${selectedPlant === option ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-high'}`}
+                                    >
+                                        {option}
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+            <div>
+                <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Category</label>
+                <div className="flex flex-wrap gap-2">
+                    {logCategories.map(category => (
+                        <button 
+                            key={category}
+                            onClick={() => setActiveLogCategory(category)}
+                            className={`px-4 py-2 rounded-full font-label-sm text-[12px] transition-all duration-300 ${activeLogCategory === category ? 'bg-primary text-white dark:text-[#002113] shadow-sm border border-transparent' : 'border border-outline-variant/50 bg-surface text-on-surface hover:bg-surface-container-high'}`}
+                            type="button"
+                        >
+                            {category}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            <div>
+                <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Observations</label>
+                <textarea className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[14px] text-on-surface placeholder:text-[13px] placeholder:font-light placeholder:text-on-surface-variant/70 focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all duration-300 shadow-sm" placeholder="What did you notice today?" rows="4"></textarea>
+            </div>
+            <div className="flex gap-4">
+                <button className="flex-1 bg-primary text-white dark:text-[#002113] py-3 rounded-full font-label-md text-[14px] shadow-sm hover:opacity-90 transition-opacity" type="submit">
+                    Save Entry
+                </button>
+                <button className="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors" type="button">
+                    <span className="material-symbols-outlined">add_a_photo</span>
+                </button>
+            </div>
+        </form>
+    );
+
     return (
         <div className="flex flex-col gap-6 relative h-full w-full">
             <ScrollReveal direction="down">
@@ -56,18 +124,36 @@ export default function Journal() {
                 {/* Left: Primary Feed */}
                 <section className="lg:col-span-8 space-y-6">
                     <ScrollReveal direction="left" delay={0.1}>
-                        <div className="flex items-center justify-between mb-6 transition-colors duration-500">
-                            <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                                {filters.map(filter => (
-                                    <button
-                                        key={filter}
-                                        onClick={() => setActiveFilter(filter)}
-                                        className={`px-6 py-2 rounded-full font-label-md text-[14px] transition-colors duration-300 shadow-sm ${activeFilter === filter ? 'bg-primary text-white dark:text-[#002113]' : 'bg-surface-container-lowest text-on-surface-variant border border-outline-variant hover:bg-surface-container-highest'}`}
-                                    >
-                                        {filter}
-                                    </button>
-                                ))}
-                            </div>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar mb-4 lg:mb-6">
+                            {filters.map(filter => (
+                                <button
+                                    key={filter}
+                                    onClick={() => setActiveFilter(filter)}
+                                    className={`px-6 py-2 rounded-full font-label-md text-[14px] transition-colors duration-300 shadow-sm whitespace-nowrap ${activeFilter === filter ? 'bg-primary text-white dark:text-[#002113]' : 'bg-surface-container-lowest text-on-surface-variant border border-outline-variant hover:bg-surface-container-highest'}`}
+                                >
+                                    {filter}
+                                </button>
+                            ))}
+                        </div>
+                        
+                        <div className="lg:hidden mb-6">
+                            <button 
+                                onClick={() => setIsMobileLogOpen(!isMobileLogOpen)}
+                                className={`w-full flex items-center justify-between p-4 bg-surface border border-outline-variant/30 shadow-sm text-primary font-headline-sm font-bold text-[20px] transition-all ${isMobileLogOpen ? 'rounded-t-2xl border-b-0' : 'rounded-2xl'}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[24px]">edit_note</span>
+                                    Daily Log
+                                </div>
+                                <span className={`material-symbols-outlined transition-transform duration-300 ${isMobileLogOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                            </button>
+                            
+                            {/* Mobile Dropdown Form */}
+                            {isMobileLogOpen && (
+                                <div className="bg-surface rounded-b-2xl p-6 shadow-sm border border-outline-variant/30 border-t-0 animate-stagger" style={{ animationDelay: '0ms' }}>
+                                    {renderDailyLogForm()}
+                                </div>
+                            )}
                         </div>
                     </ScrollReveal>
                     <div className="flex flex-col gap-6">
@@ -83,76 +169,15 @@ export default function Journal() {
                 <aside className="lg:col-span-4 space-y-6">
                     <ScrollReveal direction="right" delay={0.3}>
                         <section className="bg-surface rounded-2xl p-6 shadow-sm border border-outline-variant/30 sticky top-28 transition-colors duration-500">
-                            <h3 className="font-headline-sm text-primary font-bold mb-6 flex items-center gap-2 text-[20px]">
-                                <span className="material-symbols-outlined text-primary">edit_note</span>
-                                Daily Log
-                            </h3>
-                            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                                <div>
-                                    <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Tag a Plant</label>
-                                    <div className="relative">
-                                        <div 
-                                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                            className="w-full bg-background border border-outline-variant/30 rounded-[1rem] p-4 font-body-md text-on-surface focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer transition-all duration-300 shadow-sm flex items-center justify-between relative z-20"
-                                        >
-                                            <span>{selectedPlant}</span>
-                                            <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
-                                        </div>
-                                        
-                                        {isDropdownOpen && (
-                                            <>
-                                                <div 
-                                                    className="fixed inset-0 z-10"
-                                                    onClick={() => setIsDropdownOpen(false)}
-                                                ></div>
-                                                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-surface border border-outline-variant/30 rounded-[1rem] py-2 shadow-lg z-30 overflow-hidden animate-stagger" style={{ animationDelay: '0ms' }}>
-                                                    {plantOptions.map((option) => (
-                                                        <div
-                                                            key={option}
-                                                            onClick={() => {
-                                                                setSelectedPlant(option);
-                                                                setIsDropdownOpen(false);
-                                                            }}
-                                                            className={`px-4 py-3 cursor-pointer text-[14px] transition-colors duration-200 ${selectedPlant === option ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-high'}`}
-                                                        >
-                                                            {option}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Category</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {logCategories.map(category => (
-                                            <button 
-                                                key={category}
-                                                onClick={() => setActiveLogCategory(category)}
-                                                className={`px-4 py-2 rounded-full font-label-sm text-[12px] transition-all duration-300 ${activeLogCategory === category ? 'bg-primary text-white dark:text-[#002113] shadow-sm border border-transparent' : 'border border-outline-variant/50 bg-surface text-on-surface hover:bg-surface-container-high'}`}
-                                                type="button"
-                                            >
-                                                {category}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Observations</label>
-                                    <textarea className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[14px] text-on-surface placeholder:text-[13px] placeholder:font-light placeholder:text-on-surface-variant/70 focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all duration-300 shadow-sm" placeholder="What did you notice today?" rows="4"></textarea>
-                                </div>
-                                <div className="flex gap-4">
-                                    <button className="flex-1 bg-primary text-white dark:text-[#002113] py-3 rounded-full font-label-md text-[14px] shadow-sm hover:opacity-90 transition-opacity" type="submit">
-                                        Save Entry
-                                    </button>
-                                    <button className="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors" type="button">
-                                        <span className="material-symbols-outlined">add_a_photo</span>
-                                    </button>
-                                </div>
-                            </form>
+                            <div className="hidden lg:block">
+                                <h3 className="font-headline-sm text-primary font-bold mb-6 flex items-center gap-2 text-[20px]">
+                                    <span className="material-symbols-outlined text-primary">edit_note</span>
+                                    Daily Log
+                                </h3>
+                                {renderDailyLogForm()}
+                            </div>
                             
-                            <div className="mt-6 relative overflow-hidden rounded-xl bg-primary-container p-6 text-on-primary-container shadow-sm">
+                            <div className="mt-6 lg:mt-0 relative overflow-hidden rounded-xl bg-primary-container p-6 text-on-primary-container shadow-sm">
                                 <div className="relative z-10">
                                     <h3 className="font-label-md text-[14px] mb-2 opacity-80 uppercase tracking-widest font-semibold">Journaling Streak</h3>
                                     <div className="flex items-end gap-2">

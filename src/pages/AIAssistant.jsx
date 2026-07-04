@@ -26,7 +26,7 @@ export default function AIAssistant() {
         <div className="flex-1 flex flex-col relative h-full w-full pb-24">
             {messages.length === 0 ? (
                 /* Welcome Screen */
-                <div className="flex-1 flex flex-col items-center justify-center text-center px-4 transition-opacity duration-700 animate-stagger h-full overflow-y-auto pt-4 max-w-5xl mx-auto">
+                <div className="flex-1 flex flex-col md:justify-center text-center px-4 transition-opacity duration-700 animate-stagger h-full overflow-y-auto pt-8 md:pt-4 max-w-5xl mx-auto">
                     <ScrollReveal direction="down" className="flex flex-col items-center">
                         <div className="mb-6 animate-bounce">
                             <div className="w-20 h-20 bg-primary-container/20 rounded-full flex items-center justify-center p-4 mx-auto">
@@ -94,18 +94,18 @@ export default function AIAssistant() {
                             <button type="button" className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Upload Image">
                                 <span className="material-symbols-outlined text-[20px]">add_photo_alternate</span>
                             </button>
-                            <button type="button" className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Attach Files">
+                            <button type="button" className="hidden md:block p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Attach Files">
                                 <span className="material-symbols-outlined text-[20px]">attach_file</span>
                             </button>
                         </div>
                         <input 
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            className="flex-1 bg-transparent border-none focus:ring-0 px-4 font-body-md text-[16px] text-on-surface placeholder:text-on-surface-variant/60 outline-none" 
-                            placeholder="Ask FloraCare AI anything about your plants..." 
+                            className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 px-2 md:px-4 font-body-md text-[14px] md:text-[16px] text-on-surface placeholder:text-on-surface-variant/60 outline-none" 
+                            placeholder="Ask FloraCare AI..." 
                             type="text"
                         />
-                        <div className="flex items-center gap-1 mr-2">
+                        <div className="flex items-center gap-1 mr-1 md:mr-2">
                             <button type="button" className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Voice Input">
                                 <span className="material-symbols-outlined text-[20px]">mic</span>
                             </button>

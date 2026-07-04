@@ -3,15 +3,35 @@ import Button from '../ui/Button';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useChat } from '../../context/ChatContext';
 
-export default function SideNav() {
+export default function SideNav({ isOpen, onClose, isMobileOnly = false }) {
     const location = useLocation();
     const isAssistant = location.pathname === '/assistant';
     const isDashboard = location.pathname === '/';
     const isPlantProfile = location.pathname.startsWith('/plant/');
     const { sessions, startNewChat } = useChat();
     const [openSection, setOpenSection] = useState('health');
+    
+    const desktopClasses = isMobileOnly ? 'lg:hidden' : 'lg:relative lg:translate-x-0 lg:flex h-screen w-[260px] lg:sticky lg:top-0 border-r border-outline-variant/30';
+    
     return (
-        <aside className="hidden md:flex h-screen w-[260px] sticky left-0 top-0 bg-background border-r border-outline-variant/30 flex-col pt-8 pb-6 z-50 transition-colors duration-500">
+        <>
+            {/* Mobile Backdrop */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/50 z-[60] lg:hidden backdrop-blur-sm transition-opacity"
+                    onClick={onClose}
+                />
+            )}
+
+            <aside className={`fixed inset-y-0 left-0 z-[70] transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 bg-background flex flex-col pt-8 pb-6 ${isMobileOnly ? 'w-[260px]' : desktopClasses}`}>
+                
+                {/* Mobile Close Button */}
+                <button 
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-primary transition-colors lg:hidden"
+                >
+                    <span className="material-symbols-outlined text-[24px]">close</span>
+                </button>
             {isAssistant ? (
                 <>
                     <div className="flex items-center gap-3 px-6 mb-8">
@@ -147,5 +167,6 @@ export default function SideNav() {
                 </>
             )}
         </aside>
+        </>
     );
 }

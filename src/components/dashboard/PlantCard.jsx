@@ -13,15 +13,15 @@ export default function PlantCard({ name, species, image, status, tags }) {
             <div className={`absolute inset-y-0 left-0 w-1.5 transition-colors duration-500 ${statusColor}`}></div>
             
             {isCollection ? (
-                <div className="relative w-32 h-32 ml-2 shrink-0">
+                <div className="relative w-24 h-24 md:w-32 md:h-32 ml-2 shrink-0">
                     <div className="absolute inset-0 bg-surface-container-highest rounded-lg translate-x-2 -translate-y-2 border border-outline-variant/30"></div>
                     <div className="absolute inset-0 bg-surface-container-high rounded-lg translate-x-1 -translate-y-1 border border-outline-variant/30"></div>
                     <div className="relative w-full h-full rounded-lg overflow-hidden border border-outline-variant/30 bg-surface-container-low flex items-center justify-center shadow-inner transition-colors duration-500">
-                        <span className="material-symbols-outlined text-tertiary text-[48px]">folder</span>
+                        <span className="material-symbols-outlined text-tertiary text-[40px] md:text-[48px]">folder</span>
                     </div>
                 </div>
             ) : (
-                <div className="relative w-32 h-32 ml-2 shrink-0 rounded-lg overflow-hidden border border-outline-variant/20 shadow-inner transition-colors duration-500">
+                <div className="relative w-24 h-24 md:w-32 md:h-32 ml-2 shrink-0 rounded-lg overflow-hidden border border-outline-variant/20 shadow-inner transition-colors duration-500">
                     <img alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src={image} />
                 </div>
             )}
@@ -42,14 +42,14 @@ export default function PlantCard({ name, species, image, status, tags }) {
                         <span className="material-symbols-outlined text-on-surface-variant text-[24px] group-hover:text-primary transition-colors">arrow_forward</span>
                     </div>
                 ) : (
-                    <div className="mt-4 flex flex-wrap items-center gap-2">
-                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Watering">
+                    <div className="mt-4 flex items-center gap-2">
+                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Watering">
                             <span className="material-symbols-outlined text-[20px]">water_drop</span>
                         </button>
-                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Fertilizing">
+                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Fertilizing">
                             <span className="material-symbols-outlined text-[20px]">yard</span>
                         </button>
-                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Pruning">
+                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Pruning">
                             <span className="material-symbols-outlined text-[20px]">content_cut</span>
                         </button>
                     </div>

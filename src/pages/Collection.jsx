@@ -10,42 +10,9 @@ export default function Collection() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-background text-on-surface flex flex-col font-body-md transition-colors duration-500">
-            {/* Header */}
-            <header className="w-full px-8 py-4 border-b border-outline-variant/30 bg-surface">
-                <div className="max-w-[1280px] mx-auto flex justify-between items-center w-full">
-                    <Link to="/dashboard" className="flex items-center group cursor-pointer">
-                        <span className="material-symbols-outlined text-primary text-3xl mr-2">eco</span>
-                        <span className="font-bold text-xl text-primary">FloraCare</span>
-                    </Link>
-                    
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[20px] text-on-surface-variant">light_mode</span>
-                            <button 
-                                onClick={toggleTheme} 
-                                className="w-12 h-6 rounded-full bg-surface-container-high transition-colors duration-300 focus:outline-none border border-outline-variant/30 relative"
-                            >
-                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-primary transition-transform duration-300 transform flex items-center justify-center ${isDark ? 'translate-x-6' : ''}`}></div>
-                            </button>
-                            <span className="material-symbols-outlined text-[20px] text-on-surface-variant">dark_mode</span>
-                        </div>
-                        <button className="flex items-center justify-center w-10 h-10 rounded-full border border-outline-variant/30 hover:bg-surface-container transition-colors">
-                            <span className="material-symbols-outlined text-on-surface">person</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            {/* Main Content */}
+        <div className="flex flex-col font-body-md transition-colors duration-500 w-full h-full pb-10">
             <main className="flex-1 w-full max-w-[1000px] mx-auto px-6 py-12">
-                <button 
-                    onClick={() => navigate('/')} 
-                    className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md mb-10"
-                >
-                    <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-                    Return to Dashboard
-                </button>
+
 
                 <ScrollReveal direction="down">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -79,11 +46,11 @@ export default function Collection() {
                                         <span className="font-label-md text-[14px] text-on-surface-variant font-medium">Health: Optimal</span>
                                     </div>
                                 </div>
-                                <div className="flex flex-col justify-center border-l border-outline-variant/30 pl-6 h-full min-h-[60px]">
+                                <div className="flex flex-col justify-center md:border-l border-outline-variant/30 md:pl-6 h-full min-h-[60px]">
                                     <p className="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-widest mb-1">Last Watered</p>
                                     <p className="font-body-lg text-[18px] text-on-surface font-semibold">3 Days Ago</p>
                                 </div>
-                                <div className="flex items-center justify-end gap-2">
+                                <div className="flex items-center justify-start md:justify-end gap-2 mt-2 md:mt-0">
                                     <button onClick={(e) => e.stopPropagation()} className="p-2.5 w-10 h-10 flex items-center justify-center bg-surface-container-highest text-on-surface rounded-full border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all shadow-sm" title="Watering"><span className="material-symbols-outlined text-[20px]">water_drop</span></button>
                                     <button onClick={(e) => e.stopPropagation()} className="p-2.5 w-10 h-10 flex items-center justify-center bg-surface-container-highest text-on-surface rounded-full border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all shadow-sm" title="Fertilizer"><span className="material-symbols-outlined text-[20px]">potted_plant</span></button>
                                     <button onClick={(e) => e.stopPropagation()} className="p-2.5 w-10 h-10 flex items-center justify-center bg-surface-container-highest text-on-surface rounded-full border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all shadow-sm" title="Pruning"><span className="material-symbols-outlined text-[20px]">content_cut</span></button>
@@ -108,11 +75,11 @@ export default function Collection() {
                                         <span className="font-label-md text-[14px] text-on-surface-variant font-medium">Health: Thirsty</span>
                                     </div>
                                 </div>
-                                <div className="flex flex-col justify-center border-l border-outline-variant/30 pl-6 h-full min-h-[60px]">
+                                <div className="flex flex-col justify-center md:border-l border-outline-variant/30 md:pl-6 h-full min-h-[60px]">
                                     <p className="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-widest mb-1">Last Watered</p>
                                     <p className="font-body-lg text-[18px] text-[#B27D56] font-semibold">9 Days Ago</p>
                                 </div>
-                                <div className="flex items-center justify-end gap-2">
+                                <div className="flex items-center justify-start md:justify-end gap-2 mt-2 md:mt-0">
                                     <button onClick={(e) => e.stopPropagation()} className="p-2.5 w-10 h-10 flex items-center justify-center bg-[#B27D56] text-white rounded-full hover:scale-105 active:scale-95 transition-all shadow-md" title="Watering"><span className="material-symbols-outlined text-[20px]">water_drop</span></button>
                                     <button onClick={(e) => e.stopPropagation()} className="p-2.5 w-10 h-10 flex items-center justify-center bg-surface-container-highest text-on-surface rounded-full border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all shadow-sm" title="Fertilizer"><span className="material-symbols-outlined text-[20px]">potted_plant</span></button>
                                     <button onClick={(e) => e.stopPropagation()} className="p-2.5 w-10 h-10 flex items-center justify-center bg-surface-container-highest text-on-surface rounded-full border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all shadow-sm" title="Pruning"><span className="material-symbols-outlined text-[20px]">content_cut</span></button>
@@ -135,24 +102,6 @@ export default function Collection() {
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="w-full border-t border-outline-variant/30 bg-surface mt-20 py-12">
-                <div className="max-w-[1280px] mx-auto flex flex-col items-center gap-8 px-6">
-                    <div className="flex items-center group">
-                        <span className="material-symbols-outlined text-on-surface text-3xl mr-2">eco</span>
-                        <span className="font-bold text-xl text-on-surface">FloraCare</span>
-                    </div>
-                    <div className="flex items-center gap-8 font-label-md text-on-surface-variant">
-                        <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-                        <a href="#" className="hover:text-primary transition-colors">Help & Support</a>
-                    </div>
-                    <p className="font-body-sm text-on-surface-variant/60 text-[13px]">
-                        © 2024 FloraCare. Cultivating tranquility, one leaf at a time.
-                    </p>
-                </div>
-            </footer>
-            
             {/* Modals */}
             <AddPlantModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
         </div>

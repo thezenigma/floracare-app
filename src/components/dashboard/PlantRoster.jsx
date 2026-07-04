@@ -6,10 +6,10 @@ export default function PlantRoster({ plants }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
-        <div className="bg-surface rounded-[2rem] p-10 shadow-sm border border-outline-variant/30 animate-stagger transition-colors duration-500" style={{ animationDelay: '300ms' }}>
+        <div className="bg-surface rounded-[2rem] p-6 md:p-10 shadow-sm border border-outline-variant/30 animate-stagger transition-colors duration-500" style={{ animationDelay: '300ms' }}>
             <div className="flex justify-between items-center mb-8">
                 <h3 className="font-headline-sm text-on-surface flex items-center gap-3 font-semibold text-[18px]">
-                    <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: '"FILL" 1' }}>local_florist</span>
+                    <span className="material-symbols-outlined text-primary text-[24px] md:text-[28px]" style={{ fontVariationSettings: '"FILL" 1' }}>local_florist</span>
                     Plant Roster
                 </h3>
                 <div className="flex items-center gap-4">

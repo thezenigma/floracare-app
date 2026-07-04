@@ -26,10 +26,20 @@ function PageTransition({ children }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 1, y: `${direction * -100}vh` }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="page-scroll-container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar"
+      className="page-scroll-container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar flex flex-col"
       style={{ gridColumn: 1, gridRow: 1 }}
     >
-      {children}
+      <div className="flex-1 flex flex-col">
+        {children}
+      </div>
+      
+      {location.pathname !== '/assistant' && (
+        <footer className="w-full py-8 mt-auto flex justify-center items-center shrink-0">
+          <p className="font-label-sm text-[12px] text-on-surface-variant font-medium text-center px-4">
+            © 2026 FloraCare - Cultivating tranquility in your digital sanctuary.
+          </p>
+        </footer>
+      )}
     </motion.div>
   );
 }
@@ -43,7 +53,7 @@ function AnimatedRoutes() {
         <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/tutorial" element={<PageTransition><Tutorial /></PageTransition>} />
-        <Route path="/collection" element={<PageTransition><Collection /></PageTransition>} />
+        <Route path="/collection" element={<PageTransition><DashboardLayout><Collection /></DashboardLayout></PageTransition>} />
         <Route path="/dashboard" element={<PageTransition><DashboardLayout><Dashboard /></DashboardLayout></PageTransition>} />
         <Route path="/journal" element={<PageTransition><DashboardLayout><Journal /></DashboardLayout></PageTransition>} />
         <Route path="/assistant" element={<PageTransition><DashboardLayout><AIAssistant /></DashboardLayout></PageTransition>} />
