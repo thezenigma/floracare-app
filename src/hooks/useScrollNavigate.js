@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Global variable to track the last navigation time across component unmounts/remounts.
@@ -7,6 +7,7 @@ let lastNavigatedTime = 0;
 
 export function useScrollNavigate({ prevPath, nextPath }) {
     const navigate = useNavigate();
+    const touchStartY = useRef(0);
 
     useEffect(() => {
         const handleWheel = (e) => {
@@ -31,8 +32,41 @@ export function useScrollNavigate({ prevPath, nextPath }) {
             }
         };
 
-        // Use `{ passive: false }` if you ever need to preventDefault, but passive true is better for performance here
+        const handleTouchStart = (e) => {
+            touchStartY.current = e.touches[0].clientY;
+        };
+
+        const handleTouchEnd = (e) => {
+            const now = Date.now();
+            if (now - lastNavigatedTime < 1200) return;
+
+            const touchEndY = e.changedTouches[0].clientY;
+            // delta > 0 means scrolled down the page (finger moved up) => go to nextPath
+            // delta < 0 means scrolled up the page (finger moved down) => go to prevPath
+            const deltaY = touchStartY.current - touchEndY;
+
+            const container = e.target.closest('.page-scroll-container') || document.documentElement;
+            const isAtTop = container.scrollTop <= 0;
+            const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
+
+            if (deltaY > 50 && nextPath && isAtBottom) {
+                lastNavigatedTime = now;
+                navigate(nextPath, { state: { direction: 'down' } });
+            } else if (deltaY < -50 && prevPath && isAtTop) {
+                lastNavigatedTime = now;
+                navigate(prevPath, { state: { direction: 'up' } });
+            }
+        };
+
+        // Use `{ passive: true }` for better performance on mobile
         window.addEventListener('wheel', handleWheel, { passive: true });
-        return () => window.removeEventListener('wheel', handleWheel);
+        window.addEventListener('touchstart', handleTouchStart, { passive: true });
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
+        
+        return () => {
+            window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchend', handleTouchEnd);
+        };
     }, [navigate, prevPath, nextPath]);
 }
