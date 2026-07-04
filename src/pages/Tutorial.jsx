@@ -7,48 +7,46 @@ export default function Tutorial() {
     const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
     
-    useScrollNavigate({ prevPath: '/onboarding', nextPath: '/' });
+    useScrollNavigate({ prevPath: null, nextPath: '/dashboard' });
 
     return (
         <div className="min-h-screen bg-background text-on-surface flex flex-col relative overflow-x-hidden transition-colors duration-500 pb-32">
-            {/* Header */}
-            <header className="fixed top-0 left-0 right-0 z-50 px-8 py-6 pointer-events-none">
-                <div className="max-w-[1280px] mx-auto flex justify-between items-center w-full pointer-events-auto">
-                    <div className="flex items-center group cursor-pointer">
-                        <span className="material-symbols-outlined text-primary text-3xl mr-2">eco</span>
-                        <span className="font-bold text-xl text-primary">FloraCare</span>
+            {/* Top Navigation Overlay */}
+            <div className="absolute top-0 left-0 right-0 z-50 px-8 py-6 flex justify-end">
+                <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[20px] text-on-surface-variant dark:text-white/70">light_mode</span>
+                    <button 
+                        onClick={toggleTheme} 
+                        className="w-12 h-6 rounded-full bg-surface-container-high dark:bg-black/40 transition-colors duration-300 focus:outline-none border border-outline-variant/30 dark:border-white/20 relative"
+                    >
+                        <div className={`absolute top-[3px] left-1 w-[14px] h-[14px] rounded-full bg-primary dark:bg-[#a5f3a1] transition-transform duration-300 transform flex items-center justify-center ${isDark ? 'translate-x-6' : ''}`}></div>
+                    </button>
+                </div>
+            </div>
+
+            {/* Welcome Section */}
+            <div className="w-full min-h-screen bg-background dark:bg-[#0b140c] flex flex-col items-center justify-center relative px-8 z-10 transition-colors duration-500">
+                <div className="flex flex-col items-center text-center">
+                    {/* Centered Logo - Larger */}
+                    <div className="flex items-center gap-3 mb-8" style={isDark ? { textShadow: '0 0 40px rgba(165, 243, 161, 0.4)' } : {}}>
+                        <span className="material-symbols-outlined text-primary dark:text-[#a5f3a1] text-5xl md:text-6xl transition-colors duration-500">eco</span>
+                        <span className="font-bold text-4xl md:text-5xl text-primary dark:text-[#a5f3a1] tracking-tight transition-colors duration-500">FloraCare</span>
                     </div>
                     
-                    <div className="flex items-center gap-4">
-                        <button 
-                            onClick={toggleTheme} 
-                            className="flex items-center justify-center p-2 rounded-full border border-primary/20 hover:bg-primary/10 transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-on-surface">
-                                {isDark ? 'light_mode' : 'dark_mode'}
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <div className="flex flex-col items-center text-center w-full max-w-4xl mx-auto pt-32 px-8 min-h-[90vh] justify-center">
-                <div className="space-y-6 flex flex-col items-center">
-                    <div className="flex items-center group cursor-pointer mb-2">
-                        <span className="material-symbols-outlined text-primary text-4xl mr-2">eco</span>
-                        <span className="font-bold text-2xl text-primary">FloraCare</span>
-                    </div>
-                    <h1 className="font-display-lg text-4xl md:text-5xl lg:text-6xl text-primary text-glow leading-tight font-bold">
+                    {/* Headline - Smaller */}
+                    <h1 className="text-on-surface dark:text-[#a5f3a1] text-2xl md:text-3xl font-bold tracking-tight mb-6 transition-colors duration-500" style={isDark ? { textShadow: '0 0 30px rgba(165, 243, 161, 0.2)' } : {}}>
                         Your Digital Sanctuary Awaits
                     </h1>
-                    <p className="font-body-lg text-lg text-on-surface-variant max-w-xl mx-auto">
+                    
+                    <p className="text-on-surface-variant dark:text-[#c1dfc0] text-[15px] md:text-base max-w-[600px] mx-auto leading-relaxed transition-colors duration-500">
                         Cultivate a thriving indoor garden with precision tools and organic insights. Welcome to the future of botanical care.
                     </p>
                 </div>
                 
-                <div className="mt-32 text-on-surface-variant/70 flex flex-col items-center animate-bounce">
-                    <span className="font-label-sm uppercase tracking-widest text-[10px] mb-2">Scroll To Explore</span>
-                    <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+                {/* Scroll Indicator */}
+                <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-on-surface-variant dark:text-[#648462] flex flex-col items-center transition-colors duration-500">
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Scroll To Explore</span>
+                    <span className="material-symbols-outlined text-[24px] animate-bounce">keyboard_arrow_down</span>
                 </div>
             </div>
 
@@ -144,7 +142,7 @@ export default function Tutorial() {
                 <div className="bg-surface-container-high rounded-[2.5rem] p-16 text-center flex flex-col items-center shadow-lg border border-outline-variant/10">
                     <h2 className="text-3xl font-bold text-on-surface mb-8">Ready to Cultivate?</h2>
                     <button 
-                        onClick={() => navigate('/', { state: { direction: 'down' } })} 
+                        onClick={() => navigate('/dashboard', { state: { direction: 'down' } })} 
                         className="font-label-md bg-primary text-on-primary px-8 py-3.5 rounded-full shadow-md hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                     >
                         Enter Your Sanctuary

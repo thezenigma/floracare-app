@@ -11,7 +11,7 @@ export default function Collection() {
             {/* Header */}
             <header className="w-full px-8 py-4 border-b border-outline-variant/30 bg-surface">
                 <div className="max-w-[1280px] mx-auto flex justify-between items-center w-full">
-                    <Link to="/" className="flex items-center group cursor-pointer">
+                    <Link to="/dashboard" className="flex items-center group cursor-pointer">
                         <span className="material-symbols-outlined text-primary text-3xl mr-2">eco</span>
                         <span className="font-bold text-xl text-primary">FloraCare</span>
                     </Link>

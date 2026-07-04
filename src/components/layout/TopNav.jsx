@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import LoginModal from '../auth/LoginModal';
+import SignUpModal from '../auth/SignUpModal';
 import { useLocation } from 'react-router-dom';
 
 export default function TopNav() {
     const { isDark, toggleTheme } = useTheme();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isSignUpOpen, setIsSignUpOpen] = useState(false);
     const location = useLocation();
     const isAssistant = location.pathname === '/assistant';
 
@@ -34,7 +36,23 @@ export default function TopNav() {
                 </div>
             </header>
 
-            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+            <LoginModal 
+                isOpen={isLoginOpen} 
+                onClose={() => setIsLoginOpen(false)} 
+                onSwitchToSignUp={() => {
+                    setIsLoginOpen(false);
+                    setIsSignUpOpen(true);
+                }}
+            />
+
+            <SignUpModal
+                isOpen={isSignUpOpen}
+                onClose={() => setIsSignUpOpen(false)}
+                onSwitchToLogin={() => {
+                    setIsSignUpOpen(false);
+                    setIsLoginOpen(true);
+                }}
+            />
         </>
     );
 }

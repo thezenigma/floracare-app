@@ -37,7 +37,7 @@ export default function SideNav() {
                                 </>
                             )}
                         </NavLink>
-                        <NavLink to="/" className="flex items-center gap-3 py-3 px-4 rounded-full transition-colors text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-300">
+                        <NavLink to="/dashboard" className="flex items-center gap-3 py-3 px-4 rounded-full transition-colors text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-300">
                             <span className="material-symbols-outlined text-[20px]">local_florist</span>
                             <span className="font-body-md text-[15px] font-medium">Garden</span>
                         </NavLink>
@@ -62,14 +62,14 @@ export default function SideNav() {
                 </>
             ) : (
                 <>
-                    <Link to="/" className="flex items-center px-6 mb-8 group cursor-pointer w-fit">
+                    <Link to="/dashboard" className="flex items-center px-6 mb-8 group cursor-pointer w-fit">
                         <span className="material-symbols-outlined text-primary text-3xl mr-2">eco</span>
                         <span className="font-bold text-[22px] text-primary tracking-tight">FloraCare</span>
                     </Link>
                     
                     <div className="flex-1 flex flex-col gap-8 overflow-y-auto no-scrollbar pr-4">
                         <div className="flex flex-col gap-1 px-4">
-                            <NavLink to="/" className={({isActive}) => `flex items-center gap-3 py-3 px-4 rounded-full transition-colors ${isActive ? 'bg-primary text-white dark:text-[#002113] shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high'}`}>
+                            <NavLink to="/dashboard" className={({isActive}) => `flex items-center gap-3 py-3 px-4 rounded-full transition-colors ${isActive ? 'bg-primary text-white dark:text-[#002113] shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high'}`}>
                                 <span className="material-symbols-outlined text-[20px]">potted_plant</span>
                                 <span className="font-body-md text-[15px] font-medium">Garden</span>
                             </NavLink>

@@ -1,12 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import KPIStats from '../components/dashboard/KPIStats';
 import AlertBanner from '../components/dashboard/AlertBanner';
 import PlantRoster from '../components/dashboard/PlantRoster';
-import { useScrollNavigate } from '../hooks/useScrollNavigate';
 
 export default function Dashboard() {
-    useScrollNavigate({ prevPath: '/tutorial', nextPath: null });
     const rosterData = [
         {
             name: "Monty",

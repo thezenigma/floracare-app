@@ -14,9 +14,12 @@ export function useScrollNavigate({ prevPath, nextPath }) {
             // 1.2 second global cooldown between navigations
             if (now - lastNavigatedTime < 1200) return;
             
-            // Only navigate if at the boundaries of the page
-            const isAtTop = window.scrollY <= 0;
-            const isAtBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+            // Find the active scroll container for this page
+            const container = e.target.closest('.page-scroll-container') || document.documentElement;
+            
+            // Only navigate if at the boundaries of the container
+            const isAtTop = container.scrollTop <= 0;
+            const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
             
             // Require a slightly more deliberate scroll (threshold 50)
             if (e.deltaY > 50 && nextPath && isAtBottom) {

@@ -8,9 +8,9 @@ import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
 import AIAssistant from './pages/AIAssistant';
 import Tutorial from './pages/Tutorial';
-import Onboarding from './pages/Onboarding';
 import PlantProfile from './pages/PlantProfile';
 import Collection from './pages/Collection';
+import Home from './pages/Home';
 
 function PageTransition({ children }) {
   const location = useLocation();
@@ -25,7 +25,7 @@ function PageTransition({ children }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 1, y: `${direction * -100}vh` }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full h-full"
+      className="page-scroll-container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar"
       style={{ gridColumn: 1, gridRow: 1 }}
     >
       {children}
@@ -37,13 +37,13 @@ function AnimatedRoutes() {
   const location = useLocation();
   
   return (
-    <div className="grid grid-cols-1 grid-rows-1 overflow-x-hidden w-full relative">
+    <div className="grid grid-cols-1 grid-rows-1 overflow-hidden w-full h-screen relative bg-background">
       <AnimatePresence initial={false}>
         <Routes location={location} key={location.pathname}>
-        <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/tutorial" element={<PageTransition><Tutorial /></PageTransition>} />
         <Route path="/collection" element={<PageTransition><Collection /></PageTransition>} />
-        <Route path="/" element={<PageTransition><DashboardLayout><Dashboard /></DashboardLayout></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><DashboardLayout><Dashboard /></DashboardLayout></PageTransition>} />
         <Route path="/journal" element={<PageTransition><DashboardLayout><Journal /></DashboardLayout></PageTransition>} />
         <Route path="/assistant" element={<PageTransition><DashboardLayout><AIAssistant /></DashboardLayout></PageTransition>} />
         <Route path="/plant/:id" element={<PageTransition><DashboardLayout><PlantProfile /></DashboardLayout></PageTransition>} />

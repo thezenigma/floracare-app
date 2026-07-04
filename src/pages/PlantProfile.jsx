@@ -9,7 +9,7 @@ export default function PlantProfile() {
         <div className="flex flex-col gap-6 relative h-full w-full pb-10">
             {/* Breadcrumbs */}
             <div className="flex items-center gap-2 text-on-surface-variant font-label-sm">
-                <Link to="/" className="hover:text-primary transition-colors">Garden</Link>
+                <Link to="/dashboard" className="hover:text-primary transition-colors">Garden</Link>
                 <span className="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span>Monty</span>
             </div>
