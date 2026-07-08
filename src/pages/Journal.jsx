@@ -177,7 +177,7 @@ export default function Journal() {
                                 {renderDailyLogForm()}
                             </div>
                             
-                            <div className="mt-8 relative overflow-hidden rounded-2xl bg-primary-container p-6 text-on-primary-container shadow-sm border border-primary/20">
+                            <div className="mt-8 relative overflow-hidden rounded-[2.5rem] px-8 py-6 bg-primary-container text-on-primary-container shadow-sm border border-primary/20">
                                 <div className="relative z-10">
                                     <h3 className="font-label-md text-[14px] mb-2 opacity-80 uppercase tracking-widest font-semibold">Journaling Streak</h3>
                                     <div className="flex items-end gap-2">
