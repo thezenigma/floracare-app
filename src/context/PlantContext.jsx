@@ -46,8 +46,16 @@ export function PlantProvider({ children }) {
         setPlants(prev => prev.map(p => p.id === id ? { ...p, ...updatedData } : p));
     };
 
+    const addPlant = (newPlant) => {
+        setPlants(prev => [...prev, newPlant]);
+    };
+
+    const removePlant = (id) => {
+        setPlants(prev => prev.filter(p => p.id !== id));
+    };
+
     return (
-        <PlantContext.Provider value={{ plants, updatePlant }}>
+        <PlantContext.Provider value={{ plants, updatePlant, addPlant, removePlant }}>
             {children}
         </PlantContext.Provider>
     );

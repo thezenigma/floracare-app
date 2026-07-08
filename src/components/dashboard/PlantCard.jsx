@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { usePlantContext } from '../../context/PlantContext';
 
-export default function PlantCard({ name, species, image, status, tags }) {
+export default function PlantCard({ id, name, species, image, status, tags }) {
+    const { removePlant } = usePlantContext();
     const isAlert = status === 'alert';
     const isCollection = status === 'collection';
     const statusColor = isAlert ? 'bg-error' : (isCollection ? 'bg-tertiary' : 'bg-primary');
@@ -51,6 +53,10 @@ export default function PlantCard({ name, species, image, status, tags }) {
                         </button>
                         <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Pruning">
                             <span className="material-symbols-outlined text-[20px]">content_cut</span>
+                        </button>
+                        <div className="flex-1"></div>
+                        <button onClick={(e) => { e.preventDefault(); removePlant(id); }} className="w-10 h-10 shrink-0 rounded-full bg-error/10 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all duration-300 hover:scale-105" title="Delete">
+                            <span className="material-symbols-outlined text-[20px]">delete</span>
                         </button>
                     </div>
                 )}

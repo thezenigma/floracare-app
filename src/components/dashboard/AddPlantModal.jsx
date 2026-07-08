@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePlantContext } from '../../context/PlantContext';
 
 const LOCATIONS = [
     { id: 'living-room', label: 'Living Room', icon: 'weekend' },
@@ -11,6 +12,36 @@ const LOCATIONS = [
 
 export default function AddPlantModal({ isOpen, onClose }) {
     const [selectedLocation, setSelectedLocation] = useState('living-room');
+    const [plantName, setPlantName] = useState('');
+    const [species, setSpecies] = useState('');
+    const { addPlant } = usePlantContext();
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (!plantName.trim()) return;
+
+        const newPlant = {
+            id: `plant-${Date.now()}`,
+            name: plantName,
+            species: species || 'Unknown Species',
+            location: LOCATIONS.find(l => l.id === selectedLocation)?.label || 'Other',
+            image: "https://images.unsplash.com/photo-1598531405908-410048cd3c5f?q=80&w=600&auto=format&fit=crop",
+            status: "optimal",
+            tags: [
+                { label: "Newly Added", icon: "fiber_new", type: "neutral" }
+            ]
+        };
+
+        addPlant(newPlant);
+        
+        // Reset state
+        setPlantName('');
+        setSpecies('');
+        setSelectedLocation('living-room');
+        
+        onClose();
+    };
 
     return createPortal(
         <AnimatePresence>
@@ -49,7 +80,7 @@ export default function AddPlantModal({ isOpen, onClose }) {
                                 <p className="text-on-surface-variant max-w-md text-sm">Let's integrate a new member into your digital garden. Provide some details to get started with precision care.</p>
                             </div>
                             
-                            <form className="flex flex-col gap-5 flex-1" onSubmit={(e) => { e.preventDefault(); onClose(); }}>
+                            <form className="flex flex-col gap-5 flex-1" onSubmit={handleSubmit}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="flex flex-col gap-1">
                                         <label className="text-sm font-medium text-on-surface ml-1">Plant Name</label>
@@ -57,15 +88,20 @@ export default function AddPlantModal({ isOpen, onClose }) {
                                             className="w-full border rounded-full py-2.5 px-5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-surface-container-highest border-outline-variant" 
                                             placeholder="e.g. Oliver the Pilea" 
                                             type="text"
+                                            value={plantName}
+                                            onChange={(e) => setPlantName(e.target.value)}
+                                            required
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1 relative">
                                         <label className="text-sm font-medium text-on-surface ml-1">Species</label>
                                         <div className="relative">
-                                            <input 
+                                            <input
                                                 className="w-full border rounded-full py-2.5 px-5 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all pr-12 bg-surface-container-highest border-outline-variant" 
                                                 placeholder="Search species..." 
                                                 type="text"
+                                                value={species}
+                                                onChange={(e) => setSpecies(e.target.value)}
                                             />
                                             <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
                                         </div>
