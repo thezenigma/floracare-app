@@ -105,7 +105,7 @@ export default function Journal() {
                 <button className="flex-1 bg-primary text-white dark:text-[#002113] py-3 rounded-full font-label-md text-[14px] shadow-sm hover:opacity-90 transition-opacity" type="submit">
                     Save Entry
                 </button>
-                <button className="p-3 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors" type="button">
+                <button className="w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors" type="button">
                     <span className="material-symbols-outlined">add_a_photo</span>
                 </button>
             </div>
@@ -177,7 +177,7 @@ export default function Journal() {
                                 {renderDailyLogForm()}
                             </div>
                             
-                            <div className="mt-6 lg:mt-0 relative overflow-hidden rounded-xl bg-primary-container p-6 text-on-primary-container shadow-sm">
+                            <div className="mt-8 relative overflow-hidden rounded-2xl bg-primary-container p-6 text-on-primary-container shadow-sm border border-primary/20">
                                 <div className="relative z-10">
                                     <h3 className="font-label-md text-[14px] mb-2 opacity-80 uppercase tracking-widest font-semibold">Journaling Streak</h3>
                                     <div className="flex items-end gap-2">
