@@ -192,9 +192,6 @@ export default function AIAssistant() {
                             <button onClick={() => fileInputRef.current?.click()} type="button" className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Upload Image">
                                 <span className="material-symbols-outlined text-[20px]">add_photo_alternate</span>
                             </button>
-                            <button type="button" className="hidden md:block p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Attach Files">
-                                <span className="material-symbols-outlined text-[20px]">attach_file</span>
-                            </button>
                         </div>
                         <input 
                             value={inputValue}
@@ -205,9 +202,6 @@ export default function AIAssistant() {
                             type="text"
                         />
                         <div className="flex items-center gap-1 mr-1 md:mr-2">
-                            <button type="button" className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors active:scale-90" title="Voice Input">
-                                <span className="material-symbols-outlined text-[20px]">mic</span>
-                            </button>
                             <button type="submit" disabled={(!inputValue.trim() && !selectedImage) || isUploading} className="w-10 h-10 bg-primary text-white dark:text-[#002113] rounded-full flex items-center justify-center transition-all hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                                 {isUploading ? (
                                     <span className="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
