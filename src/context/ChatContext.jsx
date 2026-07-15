@@ -40,8 +40,12 @@ export function ChatProvider({ children }) {
             console.error("WebSocket error observed:", error);
         };
 
-        return () => ws.current?.close();
-    }, [session]);
+        return () => {
+            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                ws.current.close();
+            }
+        };
+    }, [session?.access_token]);
 
     useEffect(() => {
         if (!session?.user) return;
