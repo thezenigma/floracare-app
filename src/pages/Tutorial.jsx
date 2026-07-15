@@ -3,12 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollNavigate } from '../hooks/useScrollNavigate';
 import ScrollReveal from '../components/ui/ScrollReveal';
+import { useAuth } from '../context/AuthContext';
 
 export default function Tutorial() {
     const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
+    const { user } = useAuth();
     
-    useScrollNavigate({ prevPath: null, nextPath: '/dashboard' });
+    React.useEffect(() => {
+        if (user) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [user, navigate]);
+
+    useScrollNavigate({ prevPath: null, nextPath: '/auth' });
 
     return (
         <div className="min-h-screen bg-background text-on-surface flex flex-col relative overflow-x-hidden transition-colors duration-500 pb-32">
@@ -72,16 +80,14 @@ export default function Tutorial() {
                                 Our intelligent Health Dashboard tracks watering schedules, fertilizer cycles, and light exposure mapped directly to location-based zones in your home. Predict needs before they become problems.
                             </p>
                         </div>
-                        <div className="flex-1 w-full relative">
-                            <div className="aspect-[4/3] rounded-[2rem] bg-surface-container-high border border-outline-variant/20 shadow-lg p-6 flex flex-col gap-4">
-                                <div className="w-full h-8 bg-surface-container rounded-full w-2/3"></div>
-                                <div className="w-full h-4 bg-surface-container rounded-full w-1/2"></div>
-                                <div className="w-full h-4 bg-surface-container rounded-full w-1/3 mb-4"></div>
-                                <div className="flex gap-4 mt-auto">
-                                    <div className="flex-1 h-16 bg-surface-container rounded-2xl"></div>
-                                    <div className="flex-1 h-16 bg-surface-container rounded-2xl"></div>
-                                    <div className="flex-1 h-16 bg-surface-container rounded-2xl"></div>
-                                </div>
+                        <div className="flex-1 w-full relative group">
+                            <div className="aspect-[4/3] rounded-[2rem] shadow-xl border border-outline-variant/20 overflow-hidden relative">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=1200&q=80" 
+                                    alt="Modern plant care setup" 
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                             </div>
                         </div>
                     </div>
@@ -113,11 +119,14 @@ export default function Tutorial() {
                                 </li>
                             </ul>
                         </div>
-                        <div className="flex-1 w-full relative">
-                            <div className="aspect-[4/3] rounded-[2rem] bg-surface-container-high border border-outline-variant/20 shadow-lg p-6">
-                                 <div className="w-full h-full bg-surface-container rounded-2xl flex items-start p-4">
-                                    <span className="text-[10px] text-on-surface-variant/50 font-medium">AI Interface</span>
-                                 </div>
+                        <div className="flex-1 w-full relative group">
+                            <div className="aspect-[4/3] rounded-[2rem] shadow-xl border border-outline-variant/20 overflow-hidden relative">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=1200&q=80" 
+                                    alt="Detailed plant leaf macro" 
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                             </div>
                         </div>
                     </div>
@@ -135,16 +144,14 @@ export default function Tutorial() {
                                 Access hyper-specific, RAG-powered care guides that instantly pull from vast botanical databases to answer your exact questions.
                             </p>
                         </div>
-                        <div className="flex-1 w-full relative">
-                            <div className="aspect-[4/3] rounded-[2rem] bg-surface-container-high border border-outline-variant/20 shadow-lg p-6 flex flex-col gap-4 justify-end">
-                                <div className="h-14 bg-surface-container rounded-2xl flex items-center px-4 gap-4">
-                                    <div className="w-6 h-6 rounded-full bg-surface-container-highest"></div>
-                                    <div className="w-32 h-3 rounded-full bg-surface-container-highest"></div>
-                                </div>
-                                <div className="h-14 bg-surface-container rounded-2xl flex items-center px-4 gap-4">
-                                    <div className="w-6 h-6 rounded-full bg-surface-container-highest"></div>
-                                    <div className="w-24 h-3 rounded-full bg-surface-container-highest"></div>
-                                </div>
+                        <div className="flex-1 w-full relative group">
+                            <div className="aspect-[4/3] rounded-[2rem] shadow-xl border border-outline-variant/20 overflow-hidden relative">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80" 
+                                    alt="Hands tending to plants" 
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                             </div>
                         </div>
                     </div>

@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import Button from '../ui/Button';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useChat } from '../../context/ChatContext';
+import { usePlantContext } from '../../context/PlantContext';
 
 export default function SideNav({ isOpen, onClose, isMobileOnly = false }) {
     const location = useLocation();
     const isAssistant = location.pathname === '/assistant';
     const isDashboard = location.pathname === '/';
     const isPlantProfile = location.pathname.startsWith('/plant/');
-    const { sessions, startNewChat } = useChat();
+    const { sessions, startNewChat, loadSession, deleteSession } = useChat();
+    const { activeFilters, setActiveFilters } = usePlantContext();
     const [openSection, setOpenSection] = useState('health');
     
     const desktopClasses = isMobileOnly ? 'lg:hidden' : 'lg:relative lg:translate-x-0 lg:flex h-screen w-[260px] lg:sticky lg:top-0 border-r border-outline-variant/30';
@@ -72,9 +74,20 @@ export default function SideNav({ isOpen, onClose, isMobileOnly = false }) {
                             <div className="mt-6 flex flex-col gap-2">
                                 <span className="font-label-md text-[11px] text-on-surface-variant font-semibold uppercase tracking-widest px-4 mb-1">Recent Chats</span>
                                 {sessions.map(session => (
-                                    <div key={session.id} className="flex flex-col py-2 px-4 mx-2 rounded-xl cursor-pointer hover:bg-surface-container-high transition-colors group">
-                                        <span className="font-body-md text-[14px] text-on-surface group-hover:text-primary transition-colors truncate">{session.title}</span>
-                                        <span className="font-label-sm text-[11px] text-on-surface-variant/70">{session.date}</span>
+                                    <div key={session.id} 
+                                         onClick={() => loadSession(session.id)}
+                                         className="flex justify-between items-center py-2 px-4 mx-2 rounded-xl cursor-pointer hover:bg-surface-container-high transition-colors group">
+                                        <div className="flex flex-col overflow-hidden mr-2">
+                                            <span className="font-body-md text-[14px] text-on-surface group-hover:text-primary transition-colors truncate">{session.title}</span>
+                                            <span className="font-label-sm text-[11px] text-on-surface-variant/70">{session.date}</span>
+                                        </div>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); deleteSession(session.id); }}
+                                            className="opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-error hover:bg-error-container/20 rounded-full transition-all"
+                                            title="Delete Session"
+                                        >
+                                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -115,17 +128,17 @@ export default function SideNav({ isOpen, onClose, isMobileOnly = false }) {
                                         <span className={`material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-transform duration-300 ${openSection === 'health' ? 'rotate-180' : ''}`}>expand_more</span>
                                     </div>
                                     <div className={`flex-col gap-1 overflow-hidden transition-all duration-300 ${openSection === 'health' ? 'flex max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                        <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer bg-surface-container-highest hover-interactive">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></div>
-                                            <span className="font-body-md text-[14px] text-on-surface font-medium">All Plants</span>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, health: 'All' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.health === 'All' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.health === 'All' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.health === 'All' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>All Plants</span>
                                         </div>
-                                        <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer hover:bg-surface-container-high transition-colors hover-interactive">
-                                            <div className="w-1.5 h-1.5 rounded-full border border-outline-variant bg-transparent shrink-0"></div>
-                                            <span className="font-body-md text-[14px] text-on-surface-variant">Needs Attention</span>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, health: 'Needs Attention' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.health === 'Needs Attention' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.health === 'Needs Attention' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.health === 'Needs Attention' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>Needs Attention</span>
                                         </div>
-                                        <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer hover:bg-surface-container-high transition-colors hover-interactive">
-                                            <div className="w-1.5 h-1.5 rounded-full border border-outline-variant bg-transparent shrink-0"></div>
-                                            <span className="font-body-md text-[14px] text-on-surface-variant">Healthy</span>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, health: 'Healthy' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.health === 'Healthy' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.health === 'Healthy' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.health === 'Healthy' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>Healthy</span>
                                         </div>
                                     </div>
                                 </div>
@@ -138,18 +151,26 @@ export default function SideNav({ isOpen, onClose, isMobileOnly = false }) {
                                         <span className="font-label-md text-[11px] text-on-surface-variant font-semibold uppercase tracking-widest">Location</span>
                                         <span className={`material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-transform duration-300 ${openSection === 'location' ? 'rotate-180' : ''}`}>expand_more</span>
                                     </div>
-                                    <div className={`flex-col gap-1 overflow-hidden transition-all duration-300 ${openSection === 'location' ? 'flex max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                        <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer bg-surface-container-highest hover-interactive">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></div>
-                                            <span className="font-body-md text-[14px] text-on-surface font-medium">Living Room</span>
+                                    <div className={`flex-col gap-1 overflow-hidden transition-all duration-300 ${openSection === 'location' ? 'flex max-h-56 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, location: 'All' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.location === 'All' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.location === 'All' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.location === 'All' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>All Locations</span>
                                         </div>
-                                        <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer hover:bg-surface-container-high transition-colors hover-interactive">
-                                            <div className="w-1.5 h-1.5 rounded-full border border-outline-variant bg-transparent shrink-0"></div>
-                                            <span className="font-body-md text-[14px] text-on-surface-variant">Bedroom</span>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, location: 'Living Room' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.location === 'Living Room' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.location === 'Living Room' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.location === 'Living Room' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>Living Room</span>
                                         </div>
-                                        <div className="flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer hover:bg-surface-container-high transition-colors hover-interactive">
-                                            <div className="w-1.5 h-1.5 rounded-full border border-outline-variant bg-transparent shrink-0"></div>
-                                            <span className="font-body-md text-[14px] text-on-surface-variant">Office</span>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, location: 'Bedroom' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.location === 'Bedroom' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.location === 'Bedroom' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.location === 'Bedroom' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>Bedroom</span>
+                                        </div>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, location: 'Office' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.location === 'Office' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.location === 'Office' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.location === 'Office' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>Office</span>
+                                        </div>
+                                        <div onClick={() => setActiveFilters({ ...activeFilters, location: 'Other' })} className={`flex items-center gap-4 py-2.5 px-4 mx-2 rounded-full cursor-pointer transition-colors hover-interactive ${activeFilters.location === 'Other' ? 'bg-surface-container-highest' : 'hover:bg-surface-container-high'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeFilters.location === 'Other' ? 'bg-primary' : 'border border-outline-variant bg-transparent'}`}></div>
+                                            <span className={`font-body-md text-[14px] ${activeFilters.location === 'Other' ? 'text-on-surface font-medium' : 'text-on-surface-variant'}`}>Other</span>
                                         </div>
                                     </div>
                                 </div>

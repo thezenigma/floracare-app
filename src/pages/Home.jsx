@@ -5,12 +5,20 @@ import { useScrollNavigate } from '../hooks/useScrollNavigate';
 import ScrollReveal from '../components/ui/ScrollReveal';
 import SignUpModal from '../components/auth/SignUpModal';
 import LoginModal from '../components/auth/LoginModal';
+import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
     const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [isSignUpOpen, setIsSignUpOpen] = React.useState(false);
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        if (user) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [user, navigate]);
     
     useScrollNavigate({ prevPath: null, nextPath: '/tutorial' });
 
@@ -73,9 +81,13 @@ export default function Home() {
                     </div>
                     <div className="flex-1 w-full flex justify-center lg:justify-end">
                         <ScrollReveal direction="left" delay={0.6}>
-                            <div className="w-full max-w-[500px] aspect-square rounded-[2rem] bg-primary-container shadow-2xl overflow-hidden flex items-center justify-center p-8 border border-outline-variant/20 relative">
-                                <div className="w-48 h-48 rounded-full bg-primary/20 blur-3xl absolute"></div>
-                                <span className="material-symbols-outlined text-[150px] text-primary relative z-10 drop-shadow-2xl">energy_savings_leaf</span>
+                            <div className="w-full max-w-[500px] aspect-square rounded-[2rem] shadow-2xl overflow-hidden relative border border-outline-variant/20 group">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1459156212016-c812468e2115?auto=format&fit=crop&w=1200&q=80" 
+                                    alt="Lush indoor plant" 
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                             </div>
                         </ScrollReveal>
                     </div>
@@ -172,8 +184,14 @@ export default function Home() {
                             </p>
                         </ScrollReveal>
                     </div>
-                    <ScrollReveal direction="left" delay={0.3} className="hidden lg:block">
-                        <div className="w-[300px] h-[300px] bg-surface-container rounded-3xl opacity-50 relative z-10 border border-outline-variant/30"></div>
+                    <ScrollReveal direction="left" delay={0.3} className="hidden lg:block relative">
+                        <div className="w-[300px] h-[300px] rounded-3xl overflow-hidden shadow-xl border border-outline-variant/30">
+                            <img 
+                                src="https://images.pexels.com/photos/1903965/pexels-photo-1903965.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                                alt="Minimalist plant care" 
+                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                            />
+                        </div>
                     </ScrollReveal>
                 </section>
 

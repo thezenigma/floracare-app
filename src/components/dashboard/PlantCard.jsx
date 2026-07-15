@@ -2,13 +2,38 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { usePlantContext } from '../../context/PlantContext';
 
-export default function PlantCard({ id, name, species, image, status, tags }) {
-    const { removePlant } = usePlantContext();
-    const isAlert = status === 'alert';
+export default function PlantCard({ id, name, species, image, status, tags, watering_frequency_days, last_watered, fertilizing_frequency_days, last_fertilized }) {
+    const { removePlant, updatePlant } = usePlantContext();
+    const [currentTime, setCurrentTime] = React.useState(new Date());
+
+    React.useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 60 * 60 * 1000); // 1 hour
+        return () => clearInterval(timer);
+    }, []);
+
+    const checkIsDue = (lastDateIso, freqDays) => {
+        if (!freqDays) return false;
+        if (!lastDateIso) return true;
+        const last = new Date(lastDateIso);
+        const nextTimeMs = last.getTime() + (freqDays * 24 * 60 * 60 * 1000);
+        return nextTimeMs <= currentTime.getTime();
+    };
+
+    const isWaterDue = checkIsDue(last_watered, watering_frequency_days);
+    const isFertDue = checkIsDue(last_fertilized, fertilizing_frequency_days);
+
+    const handleTaskDone = (e, type) => {
+        e.preventDefault();
+        const now = new Date().toISOString();
+        if (type === 'water') updatePlant(id, { last_watered: now });
+        if (type === 'fertilize') updatePlant(id, { last_fertilized: now });
+    };
+
+    const isAlert = status === 'alert' || isWaterDue || isFertDue;
     const isCollection = status === 'collection';
     const statusColor = isAlert ? 'bg-error' : (isCollection ? 'bg-tertiary' : 'bg-primary');
     const hoverBorder = isAlert ? 'hover:border-error/30' : (isCollection ? 'hover:border-tertiary/30' : 'hover:border-primary/30');
-    const path = isCollection ? '/collection' : `/plant/${name.toLowerCase().replace(/ /g, '-')}`;
+    const path = isCollection ? '/collection' : `/plant/${id}`;
     
     return (
         <Link to={path} className={`bg-surface-container-lowest rounded-xl p-4 flex gap-6 items-center group border border-outline-variant/20 relative overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-lg ${hoverBorder} cursor-pointer`}>
@@ -45,10 +70,18 @@ export default function PlantCard({ id, name, species, image, status, tags }) {
                     </div>
                 ) : (
                     <div className="mt-4 flex items-center gap-2">
-                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Watering">
+                        <button 
+                            onClick={(e) => handleTaskDone(e, 'water')} 
+                            className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 ${isWaterDue ? 'bg-error text-white shadow-md animate-pulse' : 'bg-primary/5 text-primary hover:bg-primary hover:text-on-primary'}`} 
+                            title={isWaterDue ? "Watering Due!" : "Log Watering"}
+                        >
                             <span className="material-symbols-outlined text-[20px]">water_drop</span>
                         </button>
-                        <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Fertilizing">
+                        <button 
+                            onClick={(e) => handleTaskDone(e, 'fertilize')} 
+                            className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 ${isFertDue ? 'bg-error text-white shadow-md' : 'bg-primary/5 text-primary hover:bg-primary hover:text-on-primary'}`} 
+                            title={isFertDue ? "Fertilizing Due!" : "Log Fertilizing"}
+                        >
                             <span className="material-symbols-outlined text-[20px]">yard</span>
                         </button>
                         <button onClick={(e) => e.preventDefault()} className="w-10 h-10 shrink-0 rounded-full bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all duration-300 hover:scale-105" title="Pruning">

@@ -12,6 +12,8 @@ import Tutorial from './pages/Tutorial';
 import PlantProfile from './pages/PlantProfile';
 import Collection from './pages/Collection';
 import Home from './pages/Home';
+import AuthPage from './pages/AuthPage';
+import AuthGate from './components/auth/AuthGate';
 
 function PageTransition({ children }) {
   const location = useLocation();
@@ -53,11 +55,12 @@ function AnimatedRoutes() {
         <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/tutorial" element={<PageTransition><Tutorial /></PageTransition>} />
-        <Route path="/collection" element={<PageTransition><DashboardLayout><Collection /></DashboardLayout></PageTransition>} />
-        <Route path="/dashboard" element={<PageTransition><DashboardLayout><Dashboard /></DashboardLayout></PageTransition>} />
-        <Route path="/journal" element={<PageTransition><DashboardLayout><Journal /></DashboardLayout></PageTransition>} />
-        <Route path="/assistant" element={<PageTransition><DashboardLayout><AIAssistant /></DashboardLayout></PageTransition>} />
-        <Route path="/plant/:id" element={<PageTransition><DashboardLayout><PlantProfile /></DashboardLayout></PageTransition>} />
+        <Route path="/auth" element={<PageTransition><AuthPage /></PageTransition>} />
+        <Route path="/collection" element={<AuthGate><PageTransition><DashboardLayout><Collection /></DashboardLayout></PageTransition></AuthGate>} />
+        <Route path="/dashboard" element={<AuthGate><PageTransition><DashboardLayout><Dashboard /></DashboardLayout></PageTransition></AuthGate>} />
+        <Route path="/journal" element={<AuthGate><PageTransition><DashboardLayout><Journal /></DashboardLayout></PageTransition></AuthGate>} />
+        <Route path="/assistant" element={<AuthGate><PageTransition><DashboardLayout><AIAssistant /></DashboardLayout></PageTransition></AuthGate>} />
+        <Route path="/plant/:id" element={<AuthGate><PageTransition><DashboardLayout><PlantProfile /></DashboardLayout></PageTransition></AuthGate>} />
       </Routes>
       </AnimatePresence>
     </div>

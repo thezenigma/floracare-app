@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
+import { supabase } from '../../lib/supabase';
 
 export default function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
     const { isDark } = useTheme();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     if (!isOpen) return null;
+
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: { full_name: name }
+            }
+        });
+        if (error) {
+            setError(error.message);
+        } else {
+            onClose();
+        }
+        setLoading(false);
+    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -26,7 +51,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
                     </button>
                 </div>
 
-                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); onClose(); }}>
+                <form className="space-y-6" onSubmit={handleSignUp}>
+                    {error && <div className="text-red-500 font-label-sm">{error}</div>}
                     <div>
                         <label className="font-label-sm text-[12px] text-on-surface-variant mb-2 block font-medium">Full Name</label>
                         <input 
@@ -34,6 +60,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
                             className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[16px] text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
                             placeholder="Your Name"
                             required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
                     </div>
                     <div>
@@ -43,6 +71,8 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
                             className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[16px] text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
                             placeholder="gardener@floracare.com"
                             required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     <div>
@@ -52,28 +82,17 @@ export default function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
                             className="w-full bg-background border border-outline-variant/30 rounded-xl p-4 font-body-md text-[16px] text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
                             placeholder="••••••••"
                             required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
                     
                     <button 
                         type="submit"
-                        className="w-full bg-primary text-white dark:text-[#002113] py-4 rounded-full font-label-md text-[16px] shadow-sm hover:opacity-90 transition-all active:scale-[0.98]"
+                        disabled={loading}
+                        className="w-full bg-primary text-white dark:text-[#002113] py-4 rounded-full font-label-md text-[16px] shadow-sm hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-50"
                     >
-                        Create Account
-                    </button>
-
-                    <div className="flex items-center gap-4 my-4">
-                        <div className="flex-1 h-px bg-outline-variant/30"></div>
-                        <span className="font-label-sm text-[12px] text-on-surface-variant/50 uppercase tracking-widest">or</span>
-                        <div className="flex-1 h-px bg-outline-variant/30"></div>
-                    </div>
-
-                    <button 
-                        type="button"
-                        className="w-full bg-surface-container-lowest hover:bg-surface-container-high text-on-surface py-4 rounded-full font-label-md text-[16px] flex items-center justify-center gap-3 border border-outline-variant/30 transition-all shadow-sm active:scale-[0.98]"
-                    >
-                        <img alt="Google Logo" className="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWw9kXjwN0mUjw4btoCn7C1cnIKuvQiaw_IH1yIsETepnxduz5z9c-us53QsaS4Qx9JRg2T73NAu0yfPc2gqDspFJAQ7RvhRxy03cHthAED1X2exGSsZ8iYxMCnbQia4dGPaJ_2rU_A163-bfvZzz2LLcfOzR7PR4-TB0yQtik_MskDlSf7jydi5-4mmFA7s80VYqUeAymjmepyk_v53wTEtySr4p87U6UUcN9VFp0zRWKk0-W2KgdN_--cKG2O_T0THkH1xXtsGM"/>
-                        Sign up with Google
+                        {loading ? "Creating Account..." : "Create Account"}
                     </button>
                     
                     <p className="text-center font-label-sm text-[14px] text-on-surface-variant">

@@ -3,11 +3,14 @@ import { useTheme } from '../../context/ThemeContext';
 import LoginModal from '../auth/LoginModal';
 import SignUpModal from '../auth/SignUpModal';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function TopNav({ onMenuClick }) {
     const { isDark, toggleTheme } = useTheme();
+    const { user, signOut } = useAuth();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const location = useLocation();
     const isAssistant = location.pathname === '/assistant';
 
@@ -35,12 +38,35 @@ export default function TopNav({ onMenuClick }) {
                             </button>
                             <span className="material-symbols-outlined text-[20px] text-on-surface-variant">dark_mode</span>
                         </div>
-                        <button 
-                            onClick={() => setIsLoginOpen(true)}
-                            className="flex items-center justify-center w-10 h-10 rounded-full border border-outline-variant/30 hover:bg-surface-container transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-on-surface">person</span>
-                        </button>
+                        <div className="relative">
+                            <button 
+                                onClick={() => user ? setIsDropdownOpen(!isDropdownOpen) : setIsLoginOpen(true)}
+                                className="flex items-center justify-center w-10 h-10 rounded-full border border-outline-variant/30 hover:bg-surface-container transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-on-surface">person</span>
+                            </button>
+                            
+                            {isDropdownOpen && user && (
+                                <div className="absolute right-0 mt-2 w-72 bg-surface rounded-xl shadow-lg border border-outline-variant/30 overflow-hidden z-50">
+                                    <div className="p-6 border-b border-outline-variant/30 bg-surface-container-lowest">
+                                        <p className="font-headline-sm text-[16px] text-on-surface font-semibold truncate mb-1">{user.user_metadata?.full_name || 'FloraCare User'}</p>
+                                        <p className="font-label-sm text-[13px] text-on-surface-variant truncate">{user.email}</p>
+                                    </div>
+                                    <div className="p-2">
+                                        <button 
+                                            onClick={() => {
+                                                signOut();
+                                                setIsDropdownOpen(false);
+                                            }}
+                                            className="w-full text-left px-4 py-3 rounded-lg font-label-md text-[14px] text-error hover:bg-error/10 flex items-center gap-3 transition-colors"
+                                        >
+                                            <span className="material-symbols-outlined text-[20px]">logout</span>
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </header>

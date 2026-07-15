@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PlantCard from './PlantCard';
 import AddPlantModal from './AddPlantModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PlantRoster({ plants }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,10 +24,31 @@ export default function PlantRoster({ plants }) {
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {plants.map((plant, index) => (
-                    <PlantCard key={index} {...plant} />
-                ))}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative min-h-[200px]">
+                <AnimatePresence mode="popLayout">
+                    {plants.map((plant) => (
+                        <motion.div
+                            key={plant.id}
+                            layout
+                            initial={{ opacity: 0, y: -30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 30 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                        >
+                            <PlantCard {...plant} />
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+                {plants.length === 0 && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-on-surface-variant opacity-50"
+                    >
+                        <span className="material-symbols-outlined text-[48px] font-light">potted_plant</span>
+                        <p className="font-body-md text-center">No plants match your filters.</p>
+                    </motion.div>
+                )}
             </div>
             
             <AddPlantModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
