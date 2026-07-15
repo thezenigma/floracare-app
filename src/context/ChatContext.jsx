@@ -17,7 +17,8 @@ export function ChatProvider({ children }) {
 
     useEffect(() => {
         if (!session) return;
-        ws.current = new WebSocket('ws://localhost:8000/ws/chat');
+        const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/chat';
+        ws.current = new WebSocket(wsUrl);
         
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
