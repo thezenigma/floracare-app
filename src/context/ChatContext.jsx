@@ -40,7 +40,15 @@ export function ChatProvider({ children }) {
             console.error("WebSocket error observed:", error);
         };
 
+        // Keep-alive ping to prevent Ngrok/proxies from dropping idle connections
+        const pingInterval = setInterval(() => {
+            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                ws.current.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, 15000);
+
         return () => {
+            clearInterval(pingInterval);
             if (ws.current && ws.current.readyState === WebSocket.OPEN) {
                 ws.current.close();
             }
