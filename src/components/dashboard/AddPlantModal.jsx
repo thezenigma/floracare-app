@@ -32,7 +32,10 @@ export default function AddPlantModal({ isOpen, onClose }) {
         setIsSearching(true);
         setCareData(null);
         try {
-            const response = await fetch('http://localhost:8000/api/plants/search', {
+            const apiUrl = import.meta.env.VITE_API_URL || 
+                           (import.meta.env.VITE_WS_URL ? import.meta.env.VITE_WS_URL.replace('ws', 'http').replace('/ws/chat', '') : 'http://localhost:8000');
+            
+            const response = await fetch(`${apiUrl}/api/plants/search`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: species })

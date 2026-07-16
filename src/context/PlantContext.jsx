@@ -72,8 +72,8 @@ export function PlantProvider({ children }) {
         const dbNewPlant = { 
             ...newPlant, 
             user_id: user.id,
-            image_url: newPlant.image || null,
-            health_status: newPlant.status || 'Optimal'
+            image_url: newPlant.image_url || newPlant.image || null,
+            health_status: newPlant.health_status || newPlant.status || 'optimal'
         };
         // Remove frontend specific fields before inserting
         delete dbNewPlant.image;
