@@ -21,6 +21,7 @@ export default function Journal() {
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isCoolingDown, setIsCoolingDown] = useState(false);
+    const [systemMessage, setSystemMessage] = useState({ text: '', type: '', data: null });
     const imageInputRef = useRef(null);
 
     const filters = ['All Activities', 'Growth', 'Maintenance', 'Observation', 'Urgent'];
@@ -94,9 +95,10 @@ export default function Journal() {
 
     const handleSaveEntry = async (e) => {
         e.preventDefault();
+        setSystemMessage({ text: '', type: '', data: null });
         
         if (isCoolingDown) {
-            alert("Please wait a few seconds before posting another journal entry to prevent spam.");
+            setSystemMessage({ text: "Please wait a few seconds before posting another journal entry to prevent spam.", type: "error" });
             return;
         }
 
@@ -121,12 +123,12 @@ export default function Journal() {
         });
         
         if (monthlyCount >= 40) {
-            alert("You have reached your hard limit of 40 journal entries this month. Please wait until next month to post again.");
+            setSystemMessage({ text: "You have reached your hard limit of 40 journal entries this month. Please wait until next month to post again.", type: "error" });
             return;
         }
         
         if (dailyCount >= 10) {
-            alert("You have reached your hard limit of 10 journal entries today. Please try again tomorrow.");
+            setSystemMessage({ text: "You have reached your hard limit of 10 journal entries today. Please try again tomorrow.", type: "error" });
             return;
         }
         // ------------------------
@@ -134,7 +136,7 @@ export default function Journal() {
         if (!content.trim() && !imageFile) return;
         
         if (!imageFile && content.trim().length < 15) {
-            alert("Please write a more meaningful journal entry (at least 15 characters) or attach a photo.");
+            setSystemMessage({ text: "Please write a more meaningful journal entry (at least 15 characters) or attach a photo.", type: "error" });
             return;
         }
         
@@ -172,12 +174,25 @@ export default function Journal() {
         fetchStreak();
     };
 
-    const handleDeleteEntry = async (id, imageUrl) => {
-        if (!window.confirm("Are you sure you want to delete this journal entry?")) return;
+    const handleDeleteEntry = (id, imageUrl) => {
+        setSystemMessage({ 
+            text: "Are you sure you want to completely delete this journal entry? This action cannot be undone.", 
+            type: "confirm_delete", 
+            data: { id, imageUrl } 
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const executeDelete = async () => {
+        if (!systemMessage.data) return;
+        const { id, imageUrl } = systemMessage.data;
         
         const { error } = await supabase.from('journal_entries').delete().eq('id', id);
         if (!error) {
             setEntries(entries.filter(e => e.id !== id));
+            setSystemMessage({ text: "Journal entry successfully deleted.", type: "success", data: null });
+            setTimeout(() => setSystemMessage({ text: '', type: '', data: null }), 3000);
+            
             // Attempt to clean up the image from storage if it exists
             if (imageUrl) {
                 try {
@@ -190,11 +205,12 @@ export default function Journal() {
                 }
             }
         } else {
-            alert("Failed to delete the journal entry.");
+            setSystemMessage({ text: "Failed to delete the journal entry. Please try again.", type: "error", data: null });
         }
     };
 
     const renderDailyLogForm = () => (
+    <div className="flex flex-col gap-2 w-full">
         <form className="space-y-6" onSubmit={handleSaveEntry}>
             <div>
                 <label className="font-label-sm text-on-surface-variant mb-2 block text-[12px] font-medium">Tag a Plant</label>
@@ -293,6 +309,35 @@ export default function Journal() {
                 </button>
             </div>
         </form>
+        {systemMessage.text && (
+            <div className={`mt-4 p-4 rounded-xl shadow-sm border transition-all animate-stagger ${systemMessage.type === 'error' ? 'bg-error/10 text-error border-error/20' : systemMessage.type === 'success' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-warning/10 text-warning border-warning/20'}`} style={{ animationDelay: '0ms' }}>
+                <div className="flex items-start gap-2">
+                    <span className="material-symbols-outlined mt-0.5 text-[20px]">
+                        {systemMessage.type === 'error' ? 'error' : systemMessage.type === 'success' ? 'check_circle' : 'warning'}
+                    </span>
+                    <div className="flex-1">
+                        <p className="font-body-md text-[14px] leading-relaxed font-medium">{systemMessage.text}</p>
+                        {systemMessage.type === 'confirm_delete' && (
+                            <div className="flex gap-3 mt-4">
+                                <button 
+                                    onClick={executeDelete} 
+                                    className="bg-error text-white px-5 py-2 rounded-full font-label-md text-[13px] hover:bg-error/90 transition-colors shadow-sm"
+                                >
+                                    Yes, Delete Entry
+                                </button>
+                                <button 
+                                    onClick={() => setSystemMessage({ text: '', type: '', data: null })} 
+                                    className="bg-surface text-on-surface border border-outline-variant px-5 py-2 rounded-full font-label-md text-[13px] hover:bg-surface-container-high transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        )}
+    </div>
     );
 
     return (
