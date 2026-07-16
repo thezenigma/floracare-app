@@ -17,7 +17,10 @@ export function ChatProvider({ children }) {
 
     useEffect(() => {
         if (!session) return;
-        const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/chat';
+        let wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/chat';
+        if (!wsUrl.endsWith('/ws/chat')) {
+            wsUrl = wsUrl.replace(/\/$/, '') + '/ws/chat';
+        }
         ws.current = new WebSocket(wsUrl);
         
         ws.current.onmessage = (event) => {
