@@ -22,9 +22,14 @@ export default function EntryLog({ entry, index, onDelete }) {
                         )}
                     </div>
                 </div>
-                <p className="font-body-md text-[16px] text-on-surface leading-relaxed">
+                <p className="font-body-md text-[16px] text-on-surface leading-relaxed mb-4">
                     {entry.content}
                 </p>
+                {entry.image && (
+                    <div className="w-full aspect-video rounded-xl overflow-hidden shadow-sm">
+                        <img className="w-full h-full object-cover" src={entry.image} alt={entry.plantName} />
+                    </div>
+                )}
             </article>
         );
     }

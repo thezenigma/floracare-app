@@ -22,6 +22,7 @@ export default function Journal() {
     const [isUploading, setIsUploading] = useState(false);
     const [isCoolingDown, setIsCoolingDown] = useState(false);
     const [systemMessage, setSystemMessage] = useState({ text: '', type: '', data: null });
+    const [dontAskAgain, setDontAskAgain] = useState(false);
     const imageInputRef = useRef(null);
 
     const filters = ['All Activities', 'Growth', 'Maintenance', 'Observation', 'Urgent'];
@@ -175,17 +176,29 @@ export default function Journal() {
     };
 
     const handleDeleteEntry = (id, imageUrl) => {
-        setSystemMessage({ 
-            text: "Are you sure you want to completely delete this journal entry? This action cannot be undone.", 
-            type: "confirm_delete", 
-            data: { id, imageUrl } 
-        });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const skipConfirm = localStorage.getItem('floracare_skip_delete_confirm') === 'true';
+        if (skipConfirm) {
+            executeDelete(id, imageUrl);
+        } else {
+            setDontAskAgain(false);
+            setSystemMessage({ 
+                text: "Are you sure you want to completely delete this journal entry? This action cannot be undone.", 
+                type: "confirm_delete", 
+                data: { id, imageUrl } 
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
-    const executeDelete = async () => {
-        if (!systemMessage.data) return;
-        const { id, imageUrl } = systemMessage.data;
+    const executeDelete = async (directId = null, directImageUrl = null) => {
+        const id = typeof directId === 'string' ? directId : systemMessage.data?.id;
+        const imageUrl = typeof directImageUrl === 'string' ? directImageUrl : systemMessage.data?.imageUrl;
+        
+        if (!id) return;
+        
+        if (dontAskAgain) {
+            localStorage.setItem('floracare_skip_delete_confirm', 'true');
+        }
         
         const { error } = await supabase.from('journal_entries').delete().eq('id', id);
         if (!error) {
@@ -318,19 +331,30 @@ export default function Journal() {
                     <div className="flex-1">
                         <p className="font-body-md text-[14px] leading-relaxed font-medium">{systemMessage.text}</p>
                         {systemMessage.type === 'confirm_delete' && (
-                            <div className="flex gap-3 mt-4">
-                                <button 
-                                    onClick={executeDelete} 
-                                    className="bg-error text-white px-5 py-2 rounded-full font-label-md text-[13px] hover:bg-error/90 transition-colors shadow-sm"
-                                >
-                                    Yes, Delete Entry
-                                </button>
-                                <button 
-                                    onClick={() => setSystemMessage({ text: '', type: '', data: null })} 
-                                    className="bg-surface text-on-surface border border-outline-variant px-5 py-2 rounded-full font-label-md text-[13px] hover:bg-surface-container-high transition-colors"
-                                >
-                                    Cancel
-                                </button>
+                            <div className="mt-4">
+                                <div className="flex gap-3 mb-3">
+                                    <button 
+                                        onClick={() => executeDelete()} 
+                                        className="bg-error text-white px-5 py-2 rounded-full font-label-md text-[13px] hover:bg-error/90 transition-colors shadow-sm"
+                                    >
+                                        Yes, Delete Entry
+                                    </button>
+                                    <button 
+                                        onClick={() => setSystemMessage({ text: '', type: '', data: null })} 
+                                        className="bg-surface text-on-surface border border-outline-variant px-5 py-2 rounded-full font-label-md text-[13px] hover:bg-surface-container-high transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                <label className="flex items-center gap-2 cursor-pointer w-fit text-on-surface-variant hover:text-on-surface transition-colors">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={dontAskAgain}
+                                        onChange={(e) => setDontAskAgain(e.target.checked)}
+                                        className="rounded border-outline-variant text-error focus:ring-error/20"
+                                    />
+                                    <span className="font-label-sm text-[12px]">Do not ask again</span>
+                                </label>
                             </div>
                         )}
                     </div>
