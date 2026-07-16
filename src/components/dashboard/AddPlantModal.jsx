@@ -12,6 +12,16 @@ const LOCATIONS = [
     { id: 'other', label: 'Other', icon: 'more_horiz' }
 ];
 
+const SUNLIGHT_OPTIONS = [
+    "Full sun",
+    "Full sun to partial shade",
+    "Partial shade",
+    "Bright indirect light",
+    "Medium to bright indirect light",
+    "Low light",
+    "Full shade"
+];
+
 export default function AddPlantModal({ isOpen, onClose }) {
     const { user } = useAuth();
     const [selectedLocation, setSelectedLocation] = useState('living-room');
@@ -24,43 +34,62 @@ export default function AddPlantModal({ isOpen, onClose }) {
     const [careData, setCareData] = useState(null);
     const [speciesError, setSpeciesError] = useState('');
     
+    // New states for auto-suggest and custom plants
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isCustomPlant, setIsCustomPlant] = useState(false);
+    const [customWatering, setCustomWatering] = useState('');
+    const [customFertilizing, setCustomFertilizing] = useState('');
+    const [customSunlight, setCustomSunlight] = useState('');
+    const [showSunlightDropdown, setShowSunlightDropdown] = useState(false);
+    
     const fileInputRef = useRef(null);
-    const { addPlant } = usePlantContext();
+    const { addPlant, plants } = usePlantContext();
+    const isAtLimit = plants?.length >= 10;
 
-    const handleSearch = async () => {
-        if (!species.trim()) return;
+    const fetchSuggestions = async (query) => {
+        if (!query.trim()) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
         setIsSearching(true);
-        setCareData(null);
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 
-                           (import.meta.env.VITE_WS_URL ? import.meta.env.VITE_WS_URL.replace('ws', 'http').replace('/ws/chat', '') : 'http://localhost:8000');
-            
-            const response = await fetch(`${apiUrl}/api/plants/search`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: species })
-            });
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Server returned ${response.status}: ${text}`);
-            }
-            const data = await response.json();
-            if (data.care_data) {
-                setSpecies(data.species); // Update to formal name
-                setCareData(data.care_data);
-                setSpeciesError('');
-            } else if (data.species) {
-                setSpecies(data.species); // Still update name if found but no data
-                setSpeciesError("Plant found but no care profile available.");
-            } else {
-                setSpeciesError("Species not recognized. Try a different name.");
-            }
+            const { data, error } = await supabase
+                .from('plant_care_reference')
+                .select('*')
+                .or(`species.ilike.%${query}%,common_name.ilike.%${query}%`)
+                .limit(5);
+                
+            if (error) throw error;
+            setSuggestions(data || []);
+            setShowSuggestions(true);
         } catch (error) {
-            console.error("Error searching plant:", error);
-            setSpeciesError("Search failed. Please check your connection.");
+            console.error("Error fetching suggestions:", error);
         } finally {
             setIsSearching(false);
         }
+    };
+
+    const handleSpeciesChange = (e) => {
+        const val = e.target.value;
+        setSpecies(val);
+        setSpeciesError('');
+        setIsCustomPlant(false);
+        fetchSuggestions(val);
+    };
+
+    const handleSelectSuggestion = (plant) => {
+        setSpecies(plant.species);
+        setCareData(plant);
+        setShowSuggestions(false);
+        setIsCustomPlant(false);
+    };
+
+    const handleCustomPlant = () => {
+        setShowSuggestions(false);
+        setIsCustomPlant(true);
+        setCareData(null);
     };
 
     const handleImageChange = (e) => {
@@ -98,6 +127,16 @@ export default function AddPlantModal({ isOpen, onClose }) {
             return;
         }
 
+        const isActuallyCustom = isCustomPlant || (species.trim() && (!careData || careData.species !== species));
+
+        if (isActuallyCustom) {
+            setIsCustomPlant(true);
+            if (!customWatering || !customFertilizing || !customSunlight) {
+                setSpeciesError("Custom species detected. Please fill out its care requirements.");
+                return;
+            }
+        }
+
         setIsUploading(true);
         let finalImageUrl = null;
         let additionalImageUrls = [];
@@ -128,6 +167,33 @@ export default function AddPlantModal({ isOpen, onClose }) {
             }
         }
 
+        let finalWatering = careData?.watering_frequency_days || null;
+        let finalFertilizing = careData?.fertilizing_frequency_days || null;
+        let finalSunlight = careData?.sunlight_needs || null;
+
+        if (isActuallyCustom) {
+            finalWatering = parseInt(customWatering, 10) || null;
+            finalFertilizing = parseInt(customFertilizing, 10) || null;
+            finalSunlight = customSunlight || null;
+            
+            try {
+                const { error: upsertError } = await supabase.from('plant_care_reference').upsert({
+                    species: species || 'Unknown Species',
+                    common_name: species, // Using species as common_name for custom entries
+                    watering_frequency_days: finalWatering,
+                    fertilizing_frequency_days: finalFertilizing,
+                    sunlight_needs: finalSunlight
+                }, { onConflict: 'species' });
+                
+                if (upsertError) throw upsertError;
+            } catch (err) {
+                console.error("Failed to insert custom plant to reference:", err);
+                setSpeciesError("Failed to save custom species to database. Please try again.");
+                setIsUploading(false);
+                return;
+            }
+        }
+
         const newPlant = {
             name: plantName,
             species: species || 'Unknown Species',
@@ -135,9 +201,9 @@ export default function AddPlantModal({ isOpen, onClose }) {
             image_url: finalImageUrl,
             additional_image_urls: additionalImageUrls,
             health_status: "optimal",
-            watering_frequency_days: careData?.watering_frequency_days || null,
-            fertilizing_frequency_days: careData?.fertilizing_frequency_days || null,
-            sunlight_needs: careData?.sunlight_needs || null,
+            watering_frequency_days: finalWatering,
+            fertilizing_frequency_days: finalFertilizing,
+            sunlight_needs: finalSunlight,
         };
 
         try {
@@ -152,12 +218,16 @@ export default function AddPlantModal({ isOpen, onClose }) {
             imagePreviews.forEach(url => URL.revokeObjectURL(url));
             setImagePreviews([]);
             
+            setIsCustomPlant(false);
+            setCustomWatering('');
+            setCustomFertilizing('');
+            setCustomSunlight('');
             setSpeciesError('');
             onClose();
         } catch (error) {
             console.error("Failed to add plant:", error);
             if (error.code === '23503' || (error.message && error.message.includes('foreign key'))) {
-                setSpeciesError("Please search and confirm a valid species first.");
+                setSpeciesError("Invalid species. Please select or add a custom species.");
             } else {
                 setSpeciesError("Failed to integrate plant. Please try again.");
             }
@@ -213,6 +283,7 @@ export default function AddPlantModal({ isOpen, onClose }) {
                                             type="text"
                                             value={plantName}
                                             onChange={(e) => setPlantName(e.target.value)}
+                                            maxLength={60}
                                             required
                                         />
                                     </div>
@@ -227,36 +298,163 @@ export default function AddPlantModal({ isOpen, onClose }) {
                                                 }`} 
                                                 placeholder="Search species..." 
                                                 type="text"
+                                                maxLength={60}
                                                 value={species}
-                                                onChange={(e) => {
-                                                    setSpecies(e.target.value);
-                                                    setSpeciesError('');
+                                                onChange={handleSpeciesChange}
+                                                onFocus={(e) => fetchSuggestions(e.target.value)}
+                                                onBlur={() => {
+                                                    setTimeout(() => {
+                                                        setShowSuggestions(false);
+                                                        if (species.trim() && (!careData || careData.species !== species)) {
+                                                            setIsCustomPlant(true);
+                                                        }
+                                                    }, 200);
                                                 }}
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
                                                         e.preventDefault();
-                                                        handleSearch();
                                                     }
                                                 }}
                                             />
-                                            <button 
-                                                type="button"
-                                                onClick={handleSearch}
-                                                disabled={isSearching || !species.trim()}
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary p-2 rounded-full disabled:opacity-50"
-                                            >
-                                                {isSearching ? (
+                                            {isSearching && (
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2">
                                                     <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                                ) : (
-                                                    <span className="material-symbols-outlined">search</span>
-                                                )}
-                                            </button>
+                                                </div>
+                                            )}
                                         </div>
                                         {speciesError && (
                                             <span className="text-xs text-red-400 mt-0.5 ml-2 absolute -bottom-5 left-0 whitespace-nowrap">{speciesError}</span>
                                         )}
+                                        
+                                        {/* Suggestions Dropdown */}
+                                        {showSuggestions && (
+                                            <div className="absolute top-full left-0 right-0 mt-1 bg-surface-container-high border border-outline-variant rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
+                                                {suggestions.map(s => (
+                                                    <button
+                                                        key={s.species}
+                                                        type="button"
+                                                        onClick={() => handleSelectSuggestion(s)}
+                                                        className="w-full text-left px-4 py-2 hover:bg-surface-container-highest flex flex-col"
+                                                    >
+                                                        <span className="text-on-surface font-medium">{s.common_name || s.species}</span>
+                                                        {s.common_name && s.common_name !== s.species && (
+                                                            <span className="text-xs text-on-surface-variant">{s.species}</span>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCustomPlant}
+                                                    className="w-full text-left px-4 py-2 text-primary hover:bg-surface-container-highest border-t border-outline-variant flex items-center gap-2"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">add</span>
+                                                    Add "{species}" as custom plant
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
+                                
+                                {/* Custom Plant Manual Inputs */}
+                                <AnimatePresence>
+                                    {isCustomPlant && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                                            onAnimationComplete={(definition) => {
+                                                // Ensure overflow is visible after animation so dropdowns aren't clipped
+                                            }}
+                                            style={{ overflow: 'visible' }}
+                                        >
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-sm font-medium text-on-surface ml-1">Watering Freq (Days)</label>
+                                                <input 
+                                                    className="w-full border rounded-full py-2 px-4 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-highest border-outline-variant [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                                    type="number"
+                                                    min="1"
+                                                    max="365"
+                                                    value={customWatering}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        if (val === '') {
+                                                            setCustomWatering('');
+                                                        } else {
+                                                            const num = parseInt(val, 10);
+                                                            if (num > 365) setCustomWatering('365');
+                                                            else if (num < 1) setCustomWatering('1');
+                                                            else setCustomWatering(val);
+                                                        }
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <label className="text-sm font-medium text-on-surface ml-1">Fertilizing Freq (Days)</label>
+                                                <input 
+                                                    className="w-full border rounded-full py-2 px-4 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-highest border-outline-variant [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                                    type="number"
+                                                    min="1"
+                                                    max="365"
+                                                    value={customFertilizing}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        if (val === '') {
+                                                            setCustomFertilizing('');
+                                                        } else {
+                                                            const num = parseInt(val, 10);
+                                                            if (num > 365) setCustomFertilizing('365');
+                                                            else if (num < 1) setCustomFertilizing('1');
+                                                            else setCustomFertilizing(val);
+                                                        }
+                                                    }}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-1 relative">
+                                                <label className="text-sm font-medium text-on-surface ml-1">Sunlight Needs</label>
+                                                <div 
+                                                    className="w-full border rounded-full py-2 px-4 text-sm focus:outline-none transition-all flex items-center justify-between cursor-pointer bg-surface-container-highest border-outline-variant text-on-surface"
+                                                    onClick={() => setShowSunlightDropdown(!showSunlightDropdown)}
+                                                >
+                                                    <span className={customSunlight ? "text-on-surface" : "text-on-surface-variant"}>
+                                                        {customSunlight || "Select sunlight..."}
+                                                    </span>
+                                                    <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
+                                                        {showSunlightDropdown ? "expand_less" : "expand_more"}
+                                                    </span>
+                                                </div>
+                                                
+                                                {/* Custom Dropdown Options */}
+                                                <AnimatePresence>
+                                                    {showSunlightDropdown && (
+                                                        <motion.div 
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: -10 }}
+                                                            className="absolute top-full left-0 right-0 mt-1 bg-surface-container-high border border-outline-variant rounded-xl shadow-lg z-50 overflow-hidden"
+                                                        >
+                                                            {SUNLIGHT_OPTIONS.map((option) => (
+                                                                <button
+                                                                    key={option}
+                                                                    type="button"
+                                                                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-surface-container-highest transition-colors ${customSunlight === option ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface'}`}
+                                                                    onClick={() => {
+                                                                        setCustomSunlight(option);
+                                                                        setShowSunlightDropdown(false);
+                                                                    }}
+                                                                >
+                                                                    {option}
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
 
 
                                 <div className="flex flex-col gap-1">
@@ -329,28 +527,36 @@ export default function AddPlantModal({ isOpen, onClose }) {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-end gap-3 pt-2 mt-auto">
-                                    <button 
-                                        className="px-6 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" 
-                                        onClick={onClose} 
-                                        type="button"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        className="px-6 py-2.5 text-sm font-medium bg-primary text-on-primary rounded-full shadow-md hover:opacity-90 transition-all disabled:opacity-50 flex items-center gap-2" 
-                                        type="submit"
-                                        disabled={isUploading}
-                                    >
-                                        {isUploading ? (
-                                            <>
-                                                <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
-                                                Uploading...
-                                            </>
-                                        ) : (
-                                            "Integrate Plant"
-                                        )}
-                                    </button>
+                                <div className="flex flex-col gap-3 pt-2 mt-auto">
+                                    {isAtLimit && (
+                                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm flex items-start gap-2">
+                                            <span className="material-symbols-outlined text-base mt-0.5">error</span>
+                                            You have reached the maximum limit of 10 plants per user.
+                                        </div>
+                                    )}
+                                    <div className="flex items-center justify-end gap-3">
+                                        <button 
+                                            className="px-6 py-2.5 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" 
+                                            onClick={onClose} 
+                                            type="button"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            className="px-6 py-2.5 text-sm font-medium bg-primary text-on-primary rounded-full shadow-md hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2" 
+                                            type="submit"
+                                            disabled={isUploading || isAtLimit}
+                                        >
+                                            {isUploading ? (
+                                                <>
+                                                    <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                                                    Uploading...
+                                                </>
+                                            ) : (
+                                                "Integrate Plant"
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
