@@ -20,6 +20,7 @@ export default function Journal() {
     const [content, setContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isCoolingDown, setIsCoolingDown] = useState(false);
     const imageInputRef = useRef(null);
 
     const filters = ['All Activities', 'Growth', 'Maintenance', 'Observation', 'Urgent'];
@@ -46,6 +47,7 @@ export default function Journal() {
                 plantName: d.plants?.name || "General Observation",
                 species: d.plants?.species || "",
                 time: new Date(d.created_at).toLocaleString(),
+                createdAt: d.created_at,
                 category: d.category,
                 content: d.content,
                 image: d.image_url,
@@ -92,7 +94,49 @@ export default function Journal() {
 
     const handleSaveEntry = async (e) => {
         e.preventDefault();
+        
+        if (isCoolingDown) {
+            alert("Please wait a few seconds before posting another journal entry to prevent spam.");
+            return;
+        }
+
+        // --- HARD LIMIT CHECKS ---
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        
+        let dailyCount = 0;
+        let monthlyCount = 0;
+        
+        entries.forEach(entry => {
+            if (entry.createdAt) {
+                const entryTime = new Date(entry.createdAt).getTime();
+                if (entryTime >= startOfMonth) {
+                    monthlyCount++;
+                    if (entryTime >= startOfDay) {
+                        dailyCount++;
+                    }
+                }
+            }
+        });
+        
+        if (monthlyCount >= 40) {
+            alert("You have reached your hard limit of 40 journal entries this month. Please wait until next month to post again.");
+            return;
+        }
+        
+        if (dailyCount >= 10) {
+            alert("You have reached your hard limit of 10 journal entries today. Please try again tomorrow.");
+            return;
+        }
+        // ------------------------
+        
         if (!content.trim() && !imageFile) return;
+        
+        if (!imageFile && content.trim().length < 15) {
+            alert("Please write a more meaningful journal entry (at least 15 characters) or attach a photo.");
+            return;
+        }
         
         setIsUploading(true);
         let uploadedUrl = null;
@@ -122,8 +166,32 @@ export default function Journal() {
         setImageFile(null);
         if (imageInputRef.current) imageInputRef.current.value = '';
         setIsUploading(false);
+        setIsCoolingDown(true);
+        setTimeout(() => setIsCoolingDown(false), 10000); // 10 second cooldown
         fetchEntries();
         fetchStreak();
+    };
+
+    const handleDeleteEntry = async (id, imageUrl) => {
+        if (!window.confirm("Are you sure you want to delete this journal entry?")) return;
+        
+        const { error } = await supabase.from('journal_entries').delete().eq('id', id);
+        if (!error) {
+            setEntries(entries.filter(e => e.id !== id));
+            // Attempt to clean up the image from storage if it exists
+            if (imageUrl) {
+                try {
+                    const urlParts = imageUrl.split('/');
+                    const fileName = urlParts[urlParts.length - 1];
+                    const path = `${user.id}/${fileName}`;
+                    await supabase.storage.from('plant_images').remove([path]);
+                } catch (e) {
+                    console.log("Could not delete image:", e);
+                }
+            }
+        } else {
+            alert("Failed to delete the journal entry.");
+        }
     };
 
     const renderDailyLogForm = () => (
@@ -272,19 +340,20 @@ export default function Journal() {
                         </div>
                     </ScrollReveal>
                     <div className="flex flex-col gap-6">
-                        {entries
-                            .filter(e => activeFilter === 'All Activities' || e.category === activeFilter)
-                            .map((entry, index) => (
-                            <ScrollReveal key={entry.id} direction="up" delay={0.1 * (index + 2)}>
-                                <EntryLog entry={entry} index={index} />
-                            </ScrollReveal>
-                        ))}
-                        {entries.length === 0 && (
-                            <div className="text-center text-on-surface-variant py-10 opacity-70">
-                                <span className="material-symbols-outlined text-[48px] mb-2 font-light">edit_note</span>
-                                <p>No journal entries yet. Log your first observation!</p>
-                            </div>
-                        )}
+                        <div className="space-y-6 animate-stagger" style={{ animationDelay: '100ms' }}>
+                            {entries.length === 0 ? (
+                                <div className="text-center text-on-surface-variant py-8 bg-surface rounded-[2rem] border border-outline-variant/30">
+                                    <span className="material-symbols-outlined text-[48px] mb-2 opacity-50">book</span>
+                                    <p className="font-body-md text-[14px]">No journal entries yet.</p>
+                                </div>
+                            ) : (
+                                entries
+                                    .filter(e => activeFilter === 'All Activities' || e.category === activeFilter)
+                                    .map((entry, index) => (
+                                        <EntryLog key={entry.id} entry={entry} index={index} onDelete={() => handleDeleteEntry(entry.id, entry.image_url)} />
+                                    ))
+                            )}
+                        </div>
                     </div>
                 </section>
 
